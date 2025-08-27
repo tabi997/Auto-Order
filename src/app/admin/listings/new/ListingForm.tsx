@@ -318,6 +318,7 @@ export function ListingForm() {
             <AdminImagesUploader
               initialImages={form.watch('images') || []}
               onChange={(images) => form.setValue('images', images)}
+              listingId="new"
             />
             {form.formState.errors.images && (
               <p className="text-sm text-red-500">{form.formState.errors.images.message}</p>

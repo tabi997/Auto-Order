@@ -12,3 +12,6 @@ yarn-error.log*
 .idea/
 .vscode/
 pnpm-lock.yaml
+
+# Local uploads (development only)
+public/uploads/

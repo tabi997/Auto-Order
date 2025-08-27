@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { X, ImageOff, Upload } from 'lucide-react';
 import Image from 'next/image';
-import { UploadButton } from './UploadThingProvider';
-import { toast } from '@/components/ui/use-toast';
+import { LocalImageUploader } from './LocalImageUploader';
 import { useToast } from '@/components/ui/use-toast';
 
 interface ImageData {
@@ -19,18 +18,32 @@ interface AdminImagesUploaderProps {
   initialImages?: ImageData[];
   onChange: (images: ImageData[]) => void;
   maxImages?: number;
+  listingId?: string; // ID-ul listing-ului pentru organizarea fișierelor
 }
 
 export function AdminImagesUploader({ 
   initialImages = [], 
   onChange, 
-  maxImages = 8 
+  maxImages = 8,
+  listingId
 }: AdminImagesUploaderProps) {
   const [images, setImages] = useState<ImageData[]>(initialImages);
   const { toast } = useToast();
 
-  const addImage = useCallback((url: string) => {
-    if (images.length >= maxImages) {
+  const addImages = useCallback((newImages: ImageData[]) => {
+    console.log('AdminImagesUploader - addImages called with:', newImages);
+    console.log('AdminImagesUploader - Current images:', images);
+    console.log('AdminImagesUploader - Max images:', maxImages);
+    
+    // FIXED: For local upload, newImages contains only the newly uploaded images
+    // For cloud upload, newImages contains all images to be added
+    const availableSlots = maxImages - images.length;
+    const imagesToAdd = newImages.slice(0, availableSlots);
+    
+    console.log('AdminImagesUploader - Available slots:', availableSlots);
+    console.log('AdminImagesUploader - Images to add:', imagesToAdd);
+    
+    if (imagesToAdd.length === 0) {
       toast({
         title: "Limită atinsă",
         description: `Nu poți încărca mai mult de ${maxImages} imagini.`,
@@ -39,14 +52,21 @@ export function AdminImagesUploader({
       return;
     }
 
-    const newImage: ImageData = {
-      url,
-      alt: '',
-    };
-
-    const updatedImages = [...images, newImage];
+    // FIXED: For local upload, we need to merge with existing images
+    const updatedImages = [...images, ...imagesToAdd];
+    console.log('AdminImagesUploader - Updated images:', updatedImages);
+    
     setImages(updatedImages);
+    console.log('AdminImagesUploader - Calling onChange with:', updatedImages);
     onChange(updatedImages);
+    
+    if (imagesToAdd.length < newImages.length) {
+      toast({
+        title: "Limită atinsă",
+        description: `Doar ${imagesToAdd.length} din ${newImages.length} imagini au fost adăugate.`,
+        variant: "destructive",
+      });
+    }
   }, [images, maxImages, onChange, toast]);
 
   const removeImage = useCallback((index: number) => {
@@ -79,36 +99,11 @@ export function AdminImagesUploader({
       {canAddMore && (
         <Card>
           <CardContent className="p-4">
-            <UploadButton
-              endpoint="listingImages"
-              onClientUploadComplete={(res: any) => {
-                if (res && res.length > 0) {
-                  res.forEach((file: any) => {
-                    if (file.url) {
-                      addImage(file.url);
-                    }
-                  });
-                  toast({
-                    title: "Succes",
-                    description: "Imaginea a fost încărcată cu succes!",
-                  });
-                }
-              }}
-              onUploadError={(error: Error) => {
-                toast({
-                  title: "Eroare",
-                  description: `Eroare la încărcarea imaginii: ${error.message}`,
-                  variant: "destructive",
-                });
-              }}
-              onUploadBegin={(fileName: string) => {
-                console.log("Upload started for:", fileName);
-              }}
-              className="w-full"
-              appearance={{
-                button: "bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md",
-                allowedContent: "text-muted-foreground text-xs",
-              }}
+            <LocalImageUploader
+              onImagesUploaded={addImages}
+              maxFiles={maxImages - images.length}
+              maxFileSize={5}
+              listingId={listingId}
             />
           </CardContent>
         </Card>

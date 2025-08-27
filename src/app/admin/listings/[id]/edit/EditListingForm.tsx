@@ -326,6 +326,7 @@ export function EditListingForm({ listing }: EditListingFormProps) {
             <AdminImagesUploader
               initialImages={form.watch('images') || []}
               onChange={(images) => form.setValue('images', images)}
+              listingId={listing.id}
             />
             {form.formState.errors.images && (
               <p className="text-sm text-red-500">{form.formState.errors.images.message}</p>
