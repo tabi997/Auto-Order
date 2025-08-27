@@ -2,11 +2,12 @@
 
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { X, Plus, ImageOff } from 'lucide-react';
+import { X, ImageOff, Upload } from 'lucide-react';
 import Image from 'next/image';
+import { UploadButton } from './UploadThingProvider';
+import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ImageData {
   id?: string;
@@ -26,25 +27,27 @@ export function AdminImagesUploader({
   maxImages = 8 
 }: AdminImagesUploaderProps) {
   const [images, setImages] = useState<ImageData[]>(initialImages);
-  const [newImageUrl, setNewImageUrl] = useState('');
-  const [newImageAlt, setNewImageAlt] = useState('');
+  const { toast } = useToast();
 
-  const addImage = useCallback(() => {
-    if (!newImageUrl.trim()) return;
-    if (images.length >= maxImages) return;
+  const addImage = useCallback((url: string) => {
+    if (images.length >= maxImages) {
+      toast({
+        title: "Limită atinsă",
+        description: `Nu poți încărca mai mult de ${maxImages} imagini.`,
+        variant: "destructive",
+      });
+      return;
+    }
 
     const newImage: ImageData = {
-      url: newImageUrl.trim(),
-      alt: newImageAlt.trim() || undefined,
+      url,
+      alt: '',
     };
 
     const updatedImages = [...images, newImage];
     setImages(updatedImages);
     onChange(updatedImages);
-    
-    setNewImageUrl('');
-    setNewImageAlt('');
-  }, [images, newImageUrl, newImageAlt, maxImages, onChange]);
+  }, [images, maxImages, onChange, toast]);
 
   const removeImage = useCallback((index: number) => {
     const updatedImages = images.filter((_, i) => i !== index);
@@ -59,70 +62,63 @@ export function AdminImagesUploader({
     onChange(updatedImages);
   }, [images, onChange]);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addImage();
-    }
-  };
-
   const canAddMore = images.length < maxImages;
 
   return (
     <div className="space-y-4">
       <div>
-        <Label className="text-sm font-medium">
+        <h3 className="text-sm font-medium">
           Imagini (max {maxImages})
-        </Label>
+        </h3>
         <p className="text-sm text-muted-foreground">
-          Adaugă URL-uri pentru imagini. Prima imagine va fi folosită ca imagine de copertă.
+          Încarcă imagini pentru vehicul. Prima imagine va fi folosită ca imagine de copertă.
         </p>
       </div>
 
-      {/* Add new image form */}
+      {/* Upload Button */}
       {canAddMore && (
         <Card>
-          <CardContent className="p-4 space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="new-image-url">URL imagine *</Label>
-                <Input
-                  id="new-image-url"
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="new-image-alt">Text alternativ</Label>
-                <Input
-                  id="new-image-alt"
-                  placeholder="Descriere imagine (opțional)"
-                  value={newImageAlt}
-                  onChange={(e) => setNewImageAlt(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                />
-              </div>
-            </div>
-            <Button 
-              onClick={addImage} 
-              disabled={!newImageUrl.trim()}
-              size="sm"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Adaugă imagine
-            </Button>
+          <CardContent className="p-4">
+            <UploadButton
+              endpoint="listingImages"
+              onClientUploadComplete={(res: any) => {
+                if (res && res.length > 0) {
+                  res.forEach((file: any) => {
+                    if (file.url) {
+                      addImage(file.url);
+                    }
+                  });
+                  toast({
+                    title: "Succes",
+                    description: "Imaginea a fost încărcată cu succes!",
+                  });
+                }
+              }}
+              onUploadError={(error: Error) => {
+                toast({
+                  title: "Eroare",
+                  description: `Eroare la încărcarea imaginii: ${error.message}`,
+                  variant: "destructive",
+                });
+              }}
+              onUploadBegin={(fileName: string) => {
+                console.log("Upload started for:", fileName);
+              }}
+              className="w-full"
+              appearance={{
+                button: "bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md",
+                allowedContent: "text-muted-foreground text-xs",
+              }}
+            />
           </CardContent>
         </Card>
       )}
 
-      {/* Images list */}
+      {/* Images Grid */}
       {images.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {images.map((image, index) => (
-            <Card key={index} className="relative">
+            <Card key={index} className="relative group">
               <CardContent className="p-3">
                 <div className="relative aspect-[4/3] mb-3">
                   <Image
@@ -147,6 +143,8 @@ export function AdminImagesUploader({
                       }
                     }}
                   />
+                  
+                  {/* Cover Badge */}
                   {index === 0 && (
                     <div className="absolute top-2 left-2">
                       <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
@@ -154,10 +152,12 @@ export function AdminImagesUploader({
                       </span>
                     </div>
                   )}
+                  
+                  {/* Remove Button */}
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="absolute top-2 right-2 h-6 w-6 p-0"
+                    className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                     onClick={() => removeImage(index)}
                     aria-label="Șterge imaginea"
                   >
@@ -165,15 +165,15 @@ export function AdminImagesUploader({
                   </Button>
                 </div>
                 
+                {/* Image Details */}
                 <div className="space-y-2">
                   <div className="space-y-1">
-                    <Label className="text-xs">Text alternativ</Label>
-                    <Input
+                    <label className="text-xs font-medium">Text alternativ</label>
+                    <input
                       value={image.alt || ''}
                       onChange={(e) => updateImageAlt(index, e.target.value)}
                       placeholder="Descriere imagine"
-                      size={1}
-                      className="text-xs"
+                      className="w-full text-xs px-2 py-1 border rounded-md"
                     />
                   </div>
                   

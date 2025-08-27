@@ -5,6 +5,7 @@ import { Header } from "@/components/Header"
 import { Footer } from "@/components/Footer"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { ToastProvider } from "@/components/ToastProvider"
+import { UploadThingProvider } from "@/components/UploadThingProvider"
 import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -107,15 +108,17 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ToastProvider>
-            <div className="min-h-screen flex flex-col">
-              <Header />
-              <main className="flex-1">
-                {children}
-              </main>
-              <Footer />
-            </div>
-          </ToastProvider>
+          <UploadThingProvider>
+            <ToastProvider>
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+              </div>
+            </ToastProvider>
+          </UploadThingProvider>
         </ThemeProvider>
       </body>
     </html>

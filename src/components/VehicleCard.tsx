@@ -36,51 +36,51 @@ export function VehicleCard({ vehicle, showActions = true }: VehicleCardProps) {
 
   return (
     <>
-      <Card className="flex flex-col rounded-2xl shadow-sm hover:shadow-md transition bg-white overflow-hidden min-h-[380px]">
-        <CardHeader className="p-0 relative">
-          <div className="relative aspect-[4/3] w-full overflow-hidden">
-            {vehicle.image ? (
-              <Image
-                src={vehicle.image}
-                alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
-                fill
-                className="object-cover"
-                loading="lazy"
-              />
-            ) : (
-              <div className="w-full h-full bg-muted flex items-center justify-center">
-                <ImageOff className="h-12 w-12 text-muted-foreground" />
-              </div>
-            )}
-            
-            {/* Type Badge */}
-            {vehicle.type && (
-              <div className="absolute left-3 top-3">
-                <Badge
-                  variant={vehicle.type === 'BUY_NOW' ? 'default' : 'secondary'}
-                  className="text-xs"
-                >
-                  {getTypeBadge(vehicle.type)}
-                </Badge>
-              </div>
-            )}
+      <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-md transition">
+        {/* Image Section */}
+        <div className="relative aspect-[4/3] w-full overflow-hidden">
+          {vehicle.image ? (
+            <Image
+              src={vehicle.image}
+              alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
+              fill
+              className="object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <ImageOff className="h-12 w-12 text-muted-foreground" />
+            </div>
+          )}
+          
+          {/* Type Badge */}
+          {vehicle.type && (
+            <div className="absolute left-3 top-3">
+              <Badge
+                variant={vehicle.type === 'BUY_NOW' ? 'default' : 'secondary'}
+                className="text-xs"
+              >
+                {getTypeBadge(vehicle.type)}
+              </Badge>
+            </div>
+          )}
 
-            {/* Favorite button */}
-            <button
-              onClick={() => setIsFavorite(!isFavorite)}
-              className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-full transition-colors"
-              aria-label={isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'}
-            >
-              <Heart
-                className={`h-4 w-4 ${
-                  isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'
-                }`}
-              />
-            </button>
-          </div>
-        </CardHeader>
+          {/* Favorite button */}
+          <button
+            onClick={() => setIsFavorite(!isFavorite)}
+            className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-full transition-colors"
+            aria-label={isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'}
+          >
+            <Heart
+              className={`h-4 w-4 ${
+                isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'
+              }`}
+            />
+          </button>
+        </div>
 
-        <CardContent className="p-4 space-y-3 flex flex-col flex-1">
+        {/* Content Section */}
+        <div className="flex flex-col gap-2 p-4">
           {/* Title */}
           <div>
             <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
@@ -107,49 +107,41 @@ export function VehicleCard({ vehicle, showActions = true }: VehicleCardProps) {
           <p className="text-sm text-muted-foreground line-clamp-2">
             {vehicle.description}
           </p>
+        </div>
 
-          {/* Actions */}
-          {showActions && (
-            <div className="space-y-2 pt-3 mt-auto">
-              <div className="flex gap-2">
-                <Button asChild variant="outline" className="flex-1">
-                  <Link href={`/stock/${vehicle.id}`}>
-                    <Eye className="h-4 w-4 mr-2" />
-                    {t('stock.card.details')}
-                  </Link>
-                </Button>
-                <Button
-                  onClick={() => setIsLeadFormOpen(true)}
-                  className="flex-1"
-                >
-                  {t('stock.card.verify')}
-                </Button>
-              </div>
-              
-              {/* Source link */}
-              {vehicle.sourceUrl && (
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="sm"
-                  className="w-full text-xs"
-                  aria-label={`${t('stock.card.source')} pentru ${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
-                >
-                  <a
-                    href={vehicle.sourceUrl}
-                    target="_blank"
-                    rel="nofollow noopener noreferrer"
-                    title={t('stock.card.sourceTooltip')}
-                  >
-                    <ExternalLink className="h-3 w-3 mr-2" />
-                    {t('stock.card.source')} ({vehicle.sourceName || 'Sursa'})
-                  </a>
-                </Button>
-              )}
+        {/* Footer with Actions */}
+        {showActions && (
+          <div className="mt-auto p-4 pt-0">
+            <div className="flex items-center gap-2">
+              <Button asChild variant="ghost">
+                <Link href={`/stock/${vehicle.id}`}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  {t('stock.card.details')}
+                </Link>
+              </Button>
+              <Button 
+                onClick={() => setIsLeadFormOpen(true)}
+                className="min-w-[200px] shrink-0"
+              >
+                {t('stock.card.verify')}
+              </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
+            
+            {/* Source link */}
+            {vehicle.sourceUrl && (
+              <Link 
+                href={vehicle.sourceUrl} 
+                target="_blank" 
+                rel="nofollow noopener noreferrer"
+                className="mt-2 inline-flex items-center text-sm text-muted-foreground hover:underline"
+              >
+                <ExternalLink className="h-3 w-3 mr-2" />
+                Vezi sursa licitației ({vehicle.sourceName || 'Openlane'})
+              </Link>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Lead Form Modal */}
       <LeadForm
