@@ -6,22 +6,22 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { Menu, X, Car, Phone } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { useTranslation } from '@/i18n';
+import { useHomeTranslation } from '@/i18n';
 
 const navigation = [
-  { name: 'nav.home', href: '/' },
-  { name: 'nav.stock', href: '/stock' },
-  { name: 'nav.sourcing', href: '/sourcing' },
-  { name: 'nav.contact', href: '/contact' },
+  { name: 'header.nav.home', href: '/' },
+  { name: 'header.nav.stock', href: '/stock' },
+  { name: 'header.nav.sourcing', href: '/sourcing' },
+  { name: 'header.nav.contact', href: '/contact' },
 ];
 
 export function Header() {
-  const { t } = useTranslation();
+  const { t } = useHomeTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-3">
@@ -31,7 +31,7 @@ export function Header() {
               </div>
               <div className="hidden sm:block">
                 <div className="text-xl font-bold text-foreground">AutoOrder</div>
-                <div className="text-xs text-muted-foreground">Mașini la comandă</div>
+                <div className="text-xs text-muted-foreground">{t('header.brandTagline')}</div>
               </div>
             </Link>
           </div>
@@ -42,7 +42,7 @@ export function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 {t(item.name)}
               </Link>
@@ -53,13 +53,19 @@ export function Header() {
           <div className="flex items-center space-x-4">
             {/* Phone number - hidden on mobile */}
             <div className="hidden sm:flex items-center space-x-2 text-sm text-muted-foreground">
-              <Phone className="h-4 w-4" />
-              <span>+40 123 456 789</span>
+              <a 
+                href="tel:+40123456789" 
+                className="flex items-center space-x-2 hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                aria-label="Sună la AutoOrder"
+              >
+                <Phone className="h-4 w-4" />
+                <span>{t('header.phoneLabel')}</span>
+              </a>
             </div>
 
             {/* CTA Button */}
             <Button asChild size="sm" className="hidden sm:flex">
-              <Link href="/contact?type=offer">
+              <Link href="/contact?type=offer" aria-label="Cere ofertă AutoOrder">
                 {t('header.cta')}
               </Link>
             </Button>
@@ -73,6 +79,7 @@ export function Header() {
               size="sm"
               className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Deschide meniul mobil"
             >
               {mobileMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -91,7 +98,7 @@ export function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                  className="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {t(item.name)}
@@ -101,7 +108,7 @@ export function Header() {
               {/* Mobile CTA */}
               <div className="pt-4 border-t">
                 <Button asChild className="w-full">
-                  <Link href="/contact?type=offer" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/contact?type=offer" onClick={() => setMobileMenuOpen(false)} aria-label="Cere ofertă AutoOrder">
                     {t('header.cta')}
                   </Link>
                 </Button>

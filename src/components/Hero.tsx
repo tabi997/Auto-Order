@@ -1,19 +1,19 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Car, TrendingUp } from 'lucide-react';
+import { ArrowRight, Car, TrendingUp, Phone } from 'lucide-react';
 import Link from 'next/link';
-import { useTranslation } from '@/i18n';
+import { useHomeTranslation } from '@/i18n';
 
 export function Hero() {
-  const { t } = useTranslation();
+  const { t } = useHomeTranslation();
 
   return (
     <section className="relative py-20 lg:py-32 overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-background" />
       
-      <div className="relative container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+      <div className="relative container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-4xl mx-auto">
           {/* Main heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
@@ -28,15 +28,15 @@ export function Hero() {
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button asChild size="lg" className="text-lg px-8 py-6">
-              <Link href="/contact?type=offer">
-                {t('hero.cta.offer')}
+              <Link href="/contact?type=offer" aria-label="Completează brief-ul AutoOrder">
+                {t('hero.primaryCta')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             
             <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
-              <Link href="/stock">
-                {t('hero.cta.opportunities')}
+              <Link href="/stock" aria-label="Vezi oportunități AutoOrder">
+                {t('hero.secondaryCta')}
                 <Car className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -46,28 +46,28 @@ export function Hero() {
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
-                500+
+                {t('hero.stats.vehicles.value')}
               </div>
               <div className="text-muted-foreground">
-                {t('hero.stats.vehicles')}
+                {t('hero.stats.vehicles.label')}
               </div>
             </div>
             
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
-                50+
+                {t('hero.stats.countries.value')}
               </div>
               <div className="text-muted-foreground">
-                {t('hero.stats.countries')}
+                {t('hero.stats.countries.label')}
               </div>
             </div>
             
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
-                95%
+                {t('hero.stats.satisfaction.value')}
               </div>
               <div className="text-muted-foreground">
-                {t('hero.stats.satisfaction')}
+                {t('hero.stats.satisfaction.label')}
               </div>
             </div>
           </div>

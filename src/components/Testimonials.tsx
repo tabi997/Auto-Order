@@ -2,9 +2,11 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Star, Quote } from 'lucide-react';
-import { useTranslation } from '@/i18n';
+import { Star, Quote, ArrowRight } from 'lucide-react';
+import { useHomeTranslation } from '@/i18n';
+import Link from 'next/link';
 
 const testimonials = [
   {
@@ -12,64 +14,60 @@ const testimonials = [
     role: 'Dealer Auto',
     company: 'AutoMax București',
     rating: 5,
-    contentKey: 'testimonials.testimonial1.content',
+    content: 'AutoOrder mi-a găsit exact mașina pe care o căutam, la un preț excelent. Procesul a fost transparent și rapid.',
     avatar: '/avatars/ion-popescu.jpg',
-    badge: 'testimonials.testimonial1.badge',
+    badge: 'Dealer verificat',
   },
   {
     name: 'Maria Ionescu',
     role: 'Manager Flotă',
     company: 'Transport Express',
     rating: 5,
-    contentKey: 'testimonials.testimonial2.content',
+    content: 'Pentru flota noastră, AutoOrder a fost soluția perfectă. Am economisit timp și bani cu sourcing-ul lor.',
     avatar: '/avatars/maria-ionescu.jpg',
-    badge: 'testimonials.testimonial2.badge',
+    badge: 'Client fidel',
   },
   {
     name: 'Alexandru Dumitrescu',
     role: 'Proprietar',
     company: 'Firma Individuală',
     rating: 5,
-    contentKey: 'testimonials.testimonial3.content',
+    content: 'Prima dată când am folosit serviciul și am fost impresionat de profesionalism. Recomand cu încredere.',
     avatar: '/avatars/alexandru-dumitrescu.jpg',
-    badge: 'testimonials.testimonial3.badge',
+    badge: 'Prima achiziție',
   },
   {
     name: 'Elena Vasilescu',
     role: 'Director Comercial',
     company: 'Auto Solutions',
     rating: 5,
-    contentKey: 'testimonials.testimonial4.content',
+    content: 'Colaborarea cu AutoOrder ne-a permis să extindem oferta cu vehicule de calitate la prețuri competitive.',
     avatar: '/avatars/elena-vasilescu.jpg',
-    badge: 'testimonials.testimonial4.badge',
+    badge: 'Partener de afaceri',
   },
 ];
 
 export function Testimonials() {
-  const { t } = useTranslation();
+  const { t } = useHomeTranslation();
 
   return (
-    <section className="py-20 bg-muted/30">
-      <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+    <section className="py-20 md:py-24 bg-muted/30">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <Badge variant="secondary" className="mb-4">
             {t('testimonials.badge')}
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {t('testimonials.title')}
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             {t('testimonials.subtitle')}
-          </p>
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+            <Card key={index} className="group hover:shadow-md transition-all duration-300 rounded-2xl shadow-sm">
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between mb-4">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
                     <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                       {testimonial.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
@@ -84,13 +82,13 @@ export function Testimonials() {
                 </div>
                 
                 <Badge variant="outline" className="text-xs">
-                  {t(testimonial.badge)}
+                  {testimonial.badge}
                 </Badge>
               </CardHeader>
               
               <CardContent>
                 <blockquote className="text-muted-foreground leading-relaxed mb-4">
-                  "{t(testimonial.contentKey)}"
+                  &ldquo;{testimonial.content}&rdquo;
                 </blockquote>
                 
                 <div className="border-t pt-4">
@@ -115,9 +113,12 @@ export function Testimonials() {
             <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
               {t('testimonials.cta.description')}
             </p>
-            <Badge variant="default" className="text-lg px-6 py-3">
-              {t('testimonials.cta.button')}
-            </Badge>
+            <Button asChild size="lg" className="px-6 py-3">
+              <Link href="/contact?type=reference" aria-label="Cere referință AutoOrder">
+                {t('testimonials.cta.button')}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

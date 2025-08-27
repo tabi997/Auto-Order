@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Car, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { useTranslation } from '@/i18n';
+import { useHomeTranslation } from '@/i18n';
 
 interface FooterItem {
   name: string;
@@ -20,19 +20,10 @@ interface FooterMenu {
 
 const footerMenus: FooterMenu[] = [
   {
-    title: 'footer.autoOrder.title',
-    items: [
-      { name: 'footer.autoOrder.about', href: '/about' },
-      { name: 'footer.autoOrder.team', href: '/team' },
-      { name: 'footer.autoOrder.careers', href: '/careers' },
-      { name: 'footer.autoOrder.partners', href: '/partners' },
-    ],
-  },
-  {
     title: 'footer.help.title',
     items: [
       { name: 'footer.help.faq', href: '/faq' },
-      { name: 'footer.help.support', href: '/support' },
+      { name: 'footer.help.support', href: '/contact' },
       { name: 'footer.help.documentation', href: '/docs' },
       { name: 'footer.help.tutorials', href: '/tutorials' },
     ],
@@ -58,11 +49,11 @@ const footerMenus: FooterMenu[] = [
 ];
 
 export function Footer() {
-  const { t } = useTranslation();
+  const { t } = useHomeTranslation();
 
   return (
     <footer className="bg-muted/50 border-t">
-      <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
@@ -74,7 +65,7 @@ export function Footer() {
                 </div>
                 <div>
                   <div className="text-xl font-bold text-foreground">AutoOrder</div>
-                  <div className="text-sm text-muted-foreground">Mașini la comandă</div>
+                  <div className="text-sm text-muted-foreground">{t('footer.about')}</div>
                 </div>
               </div>
               
@@ -86,15 +77,27 @@ export function Footer() {
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <Mail className="h-4 w-4" />
-                  <span>contact@autoorder.ro</span>
+                  <a 
+                    href="mailto:contact@autoorder.ro" 
+                    className="hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    aria-label="Trimite email la AutoOrder"
+                  >
+                    {t('footer.contact.email')}
+                  </a>
                 </div>
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <Phone className="h-4 w-4" />
-                  <span>+40 123 456 789</span>
+                  <a 
+                    href="tel:+40123456789" 
+                    className="hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    aria-label="Sună la AutoOrder"
+                  >
+                    {t('footer.contact.phone')}
+                  </a>
                 </div>
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4" />
-                  <span>București, România</span>
+                  <span>{t('footer.contact.address')}</span>
                 </div>
               </div>
             </div>
@@ -111,7 +114,7 @@ export function Footer() {
                       {item.external ? (
                         <a
                           href={item.href}
-                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -120,7 +123,7 @@ export function Footer() {
                       ) : (
                         <Link
                           href={item.href}
-                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         >
                           {t(item.name)}
                         </Link>
@@ -148,7 +151,7 @@ export function Footer() {
               
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                 <Button asChild size="lg">
-                  <Link href="/contact?type=offer">
+                  <Link href="/contact?type=newsletter" aria-label="Abonează-te la newsletter AutoOrder">
                     {t('footer.newsletter.cta')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -168,17 +171,17 @@ export function Footer() {
         <div className="py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-muted-foreground">
-              © 2024 AutoOrder. {t('footer.copyright')}
+              {t('footer.bottom.copyright')}
             </div>
             
             <div className="flex items-center space-x-6 text-sm text-muted-foreground">
-              <Link href="/privacy" className="hover:text-foreground transition-colors">
+              <Link href="/privacy" className="hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
                 {t('footer.bottom.privacy')}
               </Link>
-              <Link href="/terms" className="hover:text-foreground transition-colors">
+              <Link href="/terms" className="hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
                 {t('footer.bottom.terms')}
               </Link>
-              <Link href="/cookies" className="hover:text-foreground transition-colors">
+              <Link href="/cookies" className="hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
                 {t('footer.bottom.cookies')}
               </Link>
             </div>

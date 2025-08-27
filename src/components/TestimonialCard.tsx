@@ -58,7 +58,7 @@ export function TestimonialCard({
       
       <CardContent>
         <blockquote className="text-muted-foreground leading-relaxed mb-4">
-          "{content}"
+          &ldquo;{content}&rdquo;
         </blockquote>
         
         <div className="border-t pt-4">

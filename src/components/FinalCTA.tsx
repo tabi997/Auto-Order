@@ -2,16 +2,16 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Car, CheckCircle, Users } from 'lucide-react';
+import { ArrowRight, Car, CheckCircle, Users, Phone } from 'lucide-react';
 import Link from 'next/link';
-import { useTranslation } from '@/i18n';
+import { useHomeTranslation } from '@/i18n';
 
 export function FinalCTA() {
-  const { t } = useTranslation();
+  const { t } = useHomeTranslation();
 
   return (
-    <section className="py-20 bg-gradient-to-br from-primary/5 via-background to-background">
-      <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+    <section className="py-20 md:py-24 bg-gradient-to-br from-primary/5 via-background to-background">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-4xl mx-auto">
           {/* Main heading */}
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
@@ -42,16 +42,17 @@ export function FinalCTA() {
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Button asChild size="lg" className="text-lg px-8 py-6">
-              <Link href="/contact?type=offer">
+              <Link href="/contact?type=offer" aria-label="Completează brief-ul AutoOrder">
                 {t('finalCta.primaryCta')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             
             <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
-              <Link href="/stock">
+              <a href="tel:+40123456789" aria-label="Sună acum AutoOrder">
+                <Phone className="mr-2 h-5 w-5" />
                 {t('finalCta.secondaryCta')}
-              </Link>
+              </a>
             </Button>
           </div>
           
@@ -59,15 +60,15 @@ export function FinalCTA() {
           <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-4 w-4 text-green-500" />
-              <span>{t('finalCta.trust1')}</span>
+              <span>Proces transparent</span>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-4 w-4 text-green-500" />
-              <span>{t('finalCta.trust2')}</span>
+              <span>Costuri clare</span>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-4 w-4 text-green-500" />
-              <span>{t('finalCta.trust3')}</span>
+              <span>Livrare garantată</span>
             </div>
           </div>
         </div>

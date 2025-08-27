@@ -5,6 +5,7 @@ import { Header } from "@/components/Header"
 import { Footer } from "@/components/Footer"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { ToastProvider } from "@/components/ToastProvider"
+import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -13,8 +14,8 @@ export const metadata: Metadata = {
     default: "AutoOrder – Mașini la comandă din licitații B2B",
     template: "%s | AutoOrder"
   },
-  description: "Licitații B2B transparente și garantate. Găsește mașina perfectă la prețul potrivit cu ajutorul expertizelor noastre.",
-  keywords: ["mașini", "licitații", "B2B", "auto", "vehicule", "sourcing", "europa"],
+  description: "Cumpărăm pentru tine din licitații B2B verificate. Transparență, raport tehnic, negociere și livrare până la ușă.",
+  keywords: ["mașini", "licitații", "B2B", "auto", "vehicule", "sourcing", "europa", "buy now", "licitații B2B"],
   authors: [{ name: "AutoOrder" }],
   creator: "AutoOrder",
   publisher: "AutoOrder",
@@ -32,11 +33,11 @@ export const metadata: Metadata = {
     locale: "ro_RO",
     url: "https://autoorder.ro",
     title: "AutoOrder – Mașini la comandă din licitații B2B",
-    description: "Licitații B2B transparente și garantate. Găsește mașina perfectă la prețul potrivit cu ajutorul expertizelor noastre.",
+    description: "Cumpărăm pentru tine din licitații B2B verificate. Transparență, raport tehnic, negociere și livrare până la ușă.",
     siteName: "AutoOrder",
     images: [
       {
-        url: "/og.png",
+        url: "/og/autoorder.png",
         width: 1200,
         height: 630,
         alt: "AutoOrder - Mașini la comandă din licitații B2B",
@@ -46,8 +47,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "AutoOrder – Mașini la comandă din licitații B2B",
-    description: "Licitații B2B transparente și garantate. Găsește mașina perfectă la prețul potrivit cu ajutorul expertizelor noastre.",
-    images: ["/og.png"],
+    description: "Cumpărăm pentru tine din licitații B2B verificate. Transparență, raport tehnic, negociere și livrare până la ușă.",
+    images: ["/og/autoorder.png"],
   },
   robots: {
     index: true,
@@ -62,6 +63,29 @@ export const metadata: Metadata = {
   },
 }
 
+// Schema.org Organization JSON-LD
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "AutoOrder",
+  "description": "Mașini la comandă din licitații B2B",
+  "url": "https://autoorder.ro",
+  "logo": "https://autoorder.ro/logo.png",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+40-123-456-789",
+    "contactType": "customer service",
+    "areaServed": "RO",
+    "availableLanguage": "Romanian"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "București",
+    "addressCountry": "RO"
+  },
+  "sameAs": []
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -69,6 +93,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ro" className="overflow-x-hidden">
+      <head>
+        <Script
+          id="organization-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+      </head>
       <body className={`${inter.className} overflow-x-hidden`}>
         <ThemeProvider
           attribute="class"

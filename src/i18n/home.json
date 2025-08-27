@@ -1,0 +1,185 @@
+{
+  "meta": {
+    "title": "AutoOrder – Mașini la comandă din licitații B2B",
+    "description": "Cumpărăm pentru tine din licitații B2B verificate. Transparență, raport tehnic, negociere și livrare până la ușă.",
+    "ogTitle": "AutoOrder – Mașini la comandă",
+    "ogDescription": "Licitații B2B transparente și garantate. Cere o ofertă în 2 minute.",
+    "ogImage": "/og/autoorder.png"
+  },
+  "header": {
+    "brandTagline": "Mașini la comandă",
+    "nav": { "home": "Acasă", "stock": "Stoc", "sourcing": "Sourcing", "contact": "Contact" },
+    "phoneLabel": "+40 123 456 789",
+    "cta": "Cere ofertă"
+  },
+  "hero": {
+    "title": "Mașini la comandă din licitații B2B",
+    "subtitle": "Transparență totală în proces, costuri clare și livrare rapidă. Tu ne spui ce vrei, noi licităm și aducem mașina potrivită.",
+    "primaryCta": "Completează brief-ul",
+    "secondaryCta": "Vezi oportunități",
+    "stats": {
+      "vehicles": { "value": "500+", "label": "vehicule eligibile / săptămână" },
+      "countries": { "value": "50+", "label": "piețe acoperite" },
+      "satisfaction": { "value": "95%", "label": "clienți recomandă" }
+    }
+  },
+  "benefits": {
+    "badge": "De ce AutoOrder",
+    "subtitle": "Avantaje reale, nu promisiuni.",
+    "items": [
+      {
+        "icon": "ShieldCheck",
+        "title": "Siguranță la achiziție",
+        "description": "Licitații B2B cu vânzători verificați, documente complete și istoric trasabil."
+      },
+      {
+        "icon": "PiggyBank",
+        "title": "Economii predictibile",
+        "description": "Negociem și alegem doar mașini cu cost total optim: preț, comisioane, transport, taxe."
+      },
+      {
+        "icon": "Zap",
+        "title": "Viteză",
+        "description": "Proces standardizat: selecție în 24–72h, licitație, plată securizată, livrare programată."
+      },
+      {
+        "icon": "Globe",
+        "title": "Acces la rețeaua B2B",
+        "description": "Platforme pan-europene, flotă, leasing și dealeri – oferte indisponibile publicului general."
+      },
+      {
+        "icon": "GraduationCap",
+        "title": "Expertiză pe domeniu",
+        "description": "Filtrare tehnică, rapoarte foto/video, interpretare erori OBD și estimări realiste de reparații."
+      },
+      {
+        "icon": "Eye",
+        "title": "Transparență 100%",
+        "description": "Îți arătăm sursa, costurile defalcate și statusul în timp real. Fără surprize."
+      }
+    ],
+    "cta": {
+      "title": "Gata să începem?",
+      "description": "Spune-ne modelul dorit, bugetul și preferințele. Revenim cu 3 opțiuni potrivite.",
+      "primary": "Completează brief-ul",
+      "secondary": "Vorbește cu un consultant"
+    }
+  },
+  "process": {
+    "badge": "Cum lucrăm",
+    "subtitle": "Proces în 4 pași, cap-coadă",
+    "steps": [
+      { "title": "Brief", "description": "Ne spui cerințele: model, kilometri, dotări, buget." },
+      { "title": "Sourcing licitații B2B", "description": "Selectăm 3–5 mașini potrivite și îți explicăm pro/contra." },
+      { "title": "Licitatie & Achiziție", "description": "Rezervăm prin Buy Now sau licităm, în limita bugetului agreat." },
+      { "title": "Transport & Livrare", "description": "Plată securizată, transport asigurat, documente și înmatriculare." }
+    ],
+    "cta": { "text": "Vreau ofertă personalizată", "badge": "Răspundem în aceeași zi" }
+  },
+  "calculator": {
+    "title": "Calculator estimativ",
+    "priceLabel": "Preț achiziție (EUR)",
+    "countryLabel": "Țara",
+    "feeLabel": "Comision (%)",
+    "transportLabel": "Transport (%)",
+    "calc": "Calculează",
+    "reset": "Reset",
+    "disclaimer": "Rezultatul este orientativ. Costurile finale depind de sursa licitației, cursul valutar, taxele locale și starea vehiculului."
+  },
+  "faq": {
+    "title": "Întrebări frecvente",
+    "items": [
+      {
+        "q": "Ce înseamnă \"Buy Now\" într-o licitație B2B?",
+        "a": "Este opțiunea de a cumpăra imediat la un preț afișat de vânzătorul B2B, fără a aștepta închiderea licitației. Rezervarea se face după validarea disponibilității și confirmarea plății."
+      },
+      {
+        "q": "Cum rezerv o mașină prin Buy Now?",
+        "a": "După ce alegi mașina, îți trimitem oferta cu costuri defalcate. Confirmi în scris, semnăm acordul de intermediere, apoi blocăm vehiculul la vânzător și emitem factura proformă."
+      },
+      {
+        "q": "Ce costuri sunt implicate?",
+        "a": "Cost total = preț vehicul + comision intermediere + taxele platformei (dacă există) + transport + costuri de înmatriculare/RAR în RO. Îți oferim mereu o estimare scrisă înainte de decizie."
+      },
+      {
+        "q": "Care este termenul de livrare?",
+        "a": "Tipic 7–21 zile lucrătoare din momentul plății, în funcție de distanță, formalități și slotul de transport."
+      },
+      {
+        "q": "Ce garanții am asupra stării mașinii?",
+        "a": "Furnizăm raport tehnic/foto, istoricul de service disponibil și, când putem, test OBD. Pentru vânzări B2B uzuale, garanțiile sunt limitate; îți explicăm clar ce acoperă fiecare caz."
+      },
+      {
+        "q": "Cum se face plata?",
+        "a": "Exclusiv prin transfer bancar în contul indicat pe factură. Nu lucrăm cu cash. Poți primi factură pe persoană fizică sau juridică."
+      },
+      {
+        "q": "Pot anula după confirmare?",
+        "a": "În caz de anulare după rezervare, platformele și vânzătorii pot reține penalități. În acordul nostru sunt precizate condițiile și sumele de reținere, pentru transparență."
+      },
+      {
+        "q": "Cine se ocupă de transport și documente?",
+        "a": "Noi. Organizăm transportul asigurat, colectăm factura, CMR, brief-ul, fișa tehnică și pregătim dosarul pentru RAR/înmatriculare."
+      },
+      {
+        "q": "Pot cumpăra ca persoană fizică?",
+        "a": "Da. Majoritatea platformelor B2B vând către persoane juridice, dar noi intermediem legal pentru persoane fizice prin firma noastră sau parteneri autorizați."
+      },
+      {
+        "q": "Ce se întâmplă dacă mașina nu corespunde?",
+        "a": "Lucrăm doar cu surse care descriu corect. La discrepanțe majore documentate, negociem remedierea sau renunțarea conform condițiilor vânzătorului/ platformei."
+      }
+    ]
+  },
+  "testimonials": {
+    "badge": "Ce spun clienții noștri",
+    "subtitle": "Feedback real de la dealeri și companii",
+    "cta": { "title": "Vrei să vorbești cu un client de-al nostru?", "description": "La cerere, îți oferim o referință.", "button": "Cere referință" }
+  },
+  "finalCta": {
+    "title": "Hai să găsim mașina potrivită",
+    "subtitle": "Completează brief-ul în 2 minute și primești 3 opțiuni filtrate.",
+    "benefit1": "Costuri transparente",
+    "benefit2": "Răspuns rapid",
+    "benefit3": "Proces cap-coadă",
+    "primaryCta": "Completează brief-ul",
+    "secondaryCta": "Sună acum"
+  },
+  "footer": {
+    "about": "AutoOrder – Mașini la comandă din licitații B2B",
+    "description": "Intermediem transparent. Selecție, licitație, transport, acte.",
+    "contact": {
+      "title": "Contact",
+      "email": "contact@autoorder.ro",
+      "phone": "+40 123 456 789",
+      "address": "București, România",
+      "schedule": "Luni–Vineri 09:00–18:00"
+    },
+    "help": {
+      "title": "Ajutor",
+      "faq": "Întrebări frecvente",
+      "support": "Suport clienți",
+      "documentation": "Ghid proces",
+      "tutorials": "Cum funcționează"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacy": "Politica de confidențialitate",
+      "terms": "Termeni și condiții",
+      "cookies": "Politica cookies",
+      "gdpr": "GDPR"
+    },
+    "bottom": {
+      "copyright": "© 2024 AutoOrder",
+      "privacy": "Confidențialitate",
+      "terms": "Termeni",
+      "cookies": "Cookies"
+    },
+    "newsletter": {
+      "title": "Abonează-te la noutăți",
+      "description": "Oferte interesante și maşini rare – maxim 2 emailuri/lună.",
+      "cta": "Mă abonez",
+      "badge": "Te poți dezabona oricând."
+    }
+  }
+}

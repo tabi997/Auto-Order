@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calculator, Euro, Truck, Percent } from 'lucide-react';
-import { useTranslation } from '@/i18n';
+import { useHomeTranslation } from '@/i18n';
 
 interface CalculationResult {
   purchasePrice: number;
@@ -22,7 +22,7 @@ interface CalculationResult {
 }
 
 export function PriceCalc() {
-  const { t } = useTranslation();
+  const { t } = useHomeTranslation();
   const [formData, setFormData] = useState({
     purchasePrice: '',
     country: '',
@@ -33,11 +33,11 @@ export function PriceCalc() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const countries = [
-    { code: 'DE', name: t('countries.DE') },
-    { code: 'FR', name: t('countries.FR') },
-    { code: 'NL', name: t('countries.NL') },
-    { code: 'BE', name: t('countries.BE') },
-    { code: 'IT', name: t('countries.IT') },
+    { code: 'DE', name: 'Germania' },
+    { code: 'FR', name: 'Franța' },
+    { code: 'NL', name: 'Olanda' },
+    { code: 'BE', name: 'Belgia' },
+    { code: 'IT', name: 'Italia' },
   ];
 
   const validateForm = useCallback(() => {
@@ -107,7 +107,7 @@ export function PriceCalc() {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full max-w-2xl mx-auto rounded-2xl shadow-sm">
       <CardHeader className="text-center">
         <CardTitle className="flex items-center justify-center gap-2">
           <Calculator className="h-6 w-6" />
@@ -118,7 +118,7 @@ export function PriceCalc() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">
-              {t('calculator.purchasePrice')}
+              {t('calculator.priceLabel')}
             </label>
             <div className="relative">
               <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -137,7 +137,7 @@ export function PriceCalc() {
 
           <div className="space-y-2">
             <label className="text-sm font-medium">
-              {t('calculator.country')}
+              {t('calculator.countryLabel')}
             </label>
             <Select
               value={formData.country}
@@ -161,7 +161,7 @@ export function PriceCalc() {
 
           <div className="space-y-2">
             <label className="text-sm font-medium">
-              {t('calculator.commission')}
+              {t('calculator.feeLabel')}
             </label>
             <div className="relative">
               <Percent className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -183,7 +183,7 @@ export function PriceCalc() {
 
           <div className="space-y-2">
             <label className="text-sm font-medium">
-              {t('calculator.transport')}
+              {t('calculator.transportLabel')}
             </label>
             <div className="relative">
               <Truck className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -206,24 +206,24 @@ export function PriceCalc() {
 
         <div className="flex gap-3">
           <Button onClick={calculatePrice} className="flex-1">
-            {t('calculator.calculate')}
+            {t('calculator.calc')}
           </Button>
           <Button variant="outline" onClick={resetForm}>
-            Reset
+            {t('calculator.reset')}
           </Button>
         </div>
 
         {result && (
           <div className="space-y-4 p-4 bg-muted rounded-lg">
             <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2">{t('calculator.total')}</h3>
+              <h3 className="text-lg font-semibold mb-2">Total estimat</h3>
               <div className="text-3xl font-bold text-primary">
                 €{result.total.toLocaleString()}
               </div>
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-medium">{t('calculator.breakdown')}</h4>
+              <h4 className="font-medium">Detalii costuri</h4>
               <div className="grid grid-cols-1 gap-2 text-sm">
                 <div className="flex justify-between">
                   <span>Preț achiziție:</span>
@@ -254,6 +254,13 @@ export function PriceCalc() {
             </div>
           </div>
         )}
+
+        {/* Disclaimer */}
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground">
+            {t('calculator.disclaimer')}
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
