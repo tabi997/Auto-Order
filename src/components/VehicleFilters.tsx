@@ -16,7 +16,7 @@ interface FilterOptions {
   bodies: string[];
   fuels: string[];
   countries: string[];
-  transmissions: string[];
+  gearboxes: string[];
   yearRange: { min: number; max: number };
   kmRange: { min: number; max: number };
   priceRange: { min: number; max: number };
@@ -43,7 +43,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
     priceMin: getParam('priceMin') || '',
     priceMax: getParam('priceMax') || '',
     country: getParam('country') || 'all',
-    transmission: getParam('transmission') || 'all',
+    gearbox: getParam('gearbox') || 'all',
   });
 
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
@@ -108,7 +108,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
       priceMin: '',
       priceMax: '',
       country: 'all',
-      transmission: 'all',
+      gearbox: 'all',
     });
     clearParams();
   };
@@ -279,16 +279,16 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
           </Select>
         </FilterField>
 
-        <FilterField label={t('stock.filters.transmission')}>
-          <Select value={filters.transmission} onValueChange={(value) => handleFilterChange('transmission', value)}>
+        <FilterField label={t('stock.filters.gearbox')}>
+          <Select value={filters.gearbox} onValueChange={(value) => handleFilterChange('gearbox', value)}>
             <SelectTrigger>
               <SelectValue placeholder="Toate cutiile" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Toate cutiile</SelectItem>
-              {filterOptions.transmissions.map((transmission) => (
-                <SelectItem key={transmission} value={transmission}>
-                  {getTransmissionLabel(transmission)}
+              {filterOptions.gearboxes.map((gearbox) => (
+                <SelectItem key={gearbox} value={gearbox}>
+                  {getTransmissionLabel(gearbox)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -299,10 +299,10 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
       {/* Action Buttons */}
       <div className="space-y-3 pt-4">
         <Button onClick={applyFilters} className="w-full">
-          Aplică filtrele
+          {t('stock.filters.apply')}
         </Button>
         <Button onClick={clearAllFilters} variant="outline" className="w-full">
-          Curăță toate
+          {t('stock.filters.clear')}
         </Button>
       </div>
     </div>
@@ -318,7 +318,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
           className="w-full"
         >
           <Filter className="h-4 w-4 mr-2" />
-          Filtre ({Object.keys(activeFilters).length})
+          {t('stock.filters.title')} ({Object.keys(activeFilters).length})
         </Button>
       </div>
 
@@ -345,7 +345,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <SlidersHorizontal className="h-5 w-5" />
-              Filtre
+              {t('stock.filters.title')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -361,7 +361,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <SlidersHorizontal className="h-5 w-5" />
-                Filtre
+                {t('stock.filters.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>

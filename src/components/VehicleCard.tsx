@@ -6,28 +6,15 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Eye, MapPin, Calendar, Gauge, Fuel, Settings } from 'lucide-react';
+import { Heart, Eye, ExternalLink, ImageOff } from 'lucide-react';
 import { useTranslation } from '@/i18n';
 import { LeadForm } from './LeadForm';
+import { fmtPrice, fmtKm, mapFuel, mapGear, mapBody } from '@/lib/format';
 
-interface Vehicle {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
-  km: number;
-  price: number;
-  body: string;
-  fuel: string;
-  transmission: string;
-  country: string;
-  image: string;
-  badges: string[];
-  description: string;
-}
+import { ApiVehicle } from '@/types/vehicle';
 
 interface VehicleCardProps {
-  vehicle: Vehicle;
+  vehicle: ApiVehicle;
   showActions?: boolean;
 }
 
@@ -36,28 +23,11 @@ export function VehicleCard({ vehicle, showActions = true }: VehicleCardProps) {
   const [isLeadFormOpen, setIsLeadFormOpen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('de-DE', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
-
-  const formatKm = (km: number) => {
-    return new Intl.NumberFormat('de-DE').format(km);
-  };
-
-  const getBodyTypeLabel = (body: string) => {
-    return t(`bodyTypes.${body}`) || body;
-  };
-
-  const getFuelTypeLabel = (fuel: string) => {
-    return t(`fuelTypes.${fuel}`) || fuel;
-  };
-
-  const getTransmissionLabel = (transmission: string) => {
-    return t(`transmission.${transmission}`) || transmission;
+  const getTypeBadge = (type?: string) => {
+    if (!type) return null;
+    if (type === 'BUY_NOW') return t('stock.badges.buyNow');
+    if (type === 'AUCTION') return t('stock.badges.auction');
+    return type;
   };
 
   const getCountryLabel = (country: string) => {
@@ -66,34 +36,40 @@ export function VehicleCard({ vehicle, showActions = true }: VehicleCardProps) {
 
   return (
     <>
-      <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
+      <Card className="flex flex-col rounded-2xl shadow-sm hover:shadow-md transition bg-white overflow-hidden min-h-[380px]">
         <CardHeader className="p-0 relative">
-          <div className="relative aspect-[4/3] overflow-hidden">
-            <Image
-              src={vehicle.image}
-              alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
-            />
+          <div className="relative aspect-[4/3] w-full overflow-hidden">
+            {vehicle.image ? (
+              <Image
+                src={vehicle.image}
+                alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
+                fill
+                className="object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full bg-muted flex items-center justify-center">
+                <ImageOff className="h-12 w-12 text-muted-foreground" />
+              </div>
+            )}
             
-            {/* Badges */}
-            <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-              {vehicle.badges.map((badge, index) => (
+            {/* Type Badge */}
+            {vehicle.type && (
+              <div className="absolute left-3 top-3">
                 <Badge
-                  key={index}
-                  variant={badge === 'Buy Now' ? 'default' : 'secondary'}
+                  variant={vehicle.type === 'BUY_NOW' ? 'default' : 'secondary'}
                   className="text-xs"
                 >
-                  {badge}
+                  {getTypeBadge(vehicle.type)}
                 </Badge>
-              ))}
-            </div>
+              </div>
+            )}
 
             {/* Favorite button */}
             <button
               onClick={() => setIsFavorite(!isFavorite)}
-              className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-white rounded-full transition-colors"
+              className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-full transition-colors"
+              aria-label={isFavorite ? 'Elimină din favorite' : 'Adaugă la favorite'}
             >
               <Heart
                 className={`h-4 w-4 ${
@@ -101,17 +77,10 @@ export function VehicleCard({ vehicle, showActions = true }: VehicleCardProps) {
                 }`}
               />
             </button>
-
-            {/* Price */}
-            <div className="absolute bottom-2 right-2 bg-white/95 px-3 py-1 rounded-lg">
-              <span className="text-lg font-bold text-primary">
-                {formatPrice(vehicle.price)}
-              </span>
-            </div>
           </div>
         </CardHeader>
 
-        <CardContent className="p-4 space-y-3">
+        <CardContent className="p-4 space-y-3 flex flex-col flex-1">
           {/* Title */}
           <div>
             <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
@@ -120,33 +89,19 @@ export function VehicleCard({ vehicle, showActions = true }: VehicleCardProps) {
             <p className="text-sm text-muted-foreground">{vehicle.year}</p>
           </div>
 
-          {/* Specifications */}
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Gauge className="h-3 w-3" />
-              <span>{formatKm(vehicle.km)} km</span>
-            </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Fuel className="h-3 w-3" />
-              <span>{getFuelTypeLabel(vehicle.fuel)}</span>
-            </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Settings className="h-3 w-3" />
-              <span>{getTransmissionLabel(vehicle.transmission)}</span>
-            </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <MapPin className="h-3 w-3" />
-              <span>{getCountryLabel(vehicle.country)}</span>
-            </div>
+          {/* Price */}
+          <div className="text-xl font-bold text-primary">
+            {fmtPrice(vehicle.price)}
           </div>
 
-          {/* Body type */}
-          <div className="flex items-center gap-1">
-            <Calendar className="h-3 w-3 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
-              {getBodyTypeLabel(vehicle.body)}
-            </span>
-          </div>
+          {/* Specifications */}
+          <p className="text-sm text-muted-foreground flex flex-wrap gap-x-2 gap-y-1">
+            <span>{fmtKm(vehicle.km)}</span>
+            <span>• {mapFuel(vehicle.fuel)}</span>
+            <span>• {mapGear(vehicle.gearbox)}</span>
+            <span>• {mapBody(vehicle.body)}</span>
+            <span>• {getCountryLabel(vehicle.country)}</span>
+          </p>
 
           {/* Description */}
           <p className="text-sm text-muted-foreground line-clamp-2">
@@ -155,19 +110,42 @@ export function VehicleCard({ vehicle, showActions = true }: VehicleCardProps) {
 
           {/* Actions */}
           {showActions && (
-            <div className="flex gap-2 pt-2">
-              <Button asChild variant="outline" className="flex-1">
-                <Link href={`/stock/${vehicle.id}`}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  {t('stock.viewDetails')}
-                </Link>
-              </Button>
-              <Button
-                onClick={() => setIsLeadFormOpen(true)}
-                className="flex-1"
-              >
-                {t('stock.requestVerification')}
-              </Button>
+            <div className="space-y-2 pt-3 mt-auto">
+              <div className="flex gap-2">
+                <Button asChild variant="outline" className="flex-1">
+                  <Link href={`/stock/${vehicle.id}`}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    {t('stock.card.details')}
+                  </Link>
+                </Button>
+                <Button
+                  onClick={() => setIsLeadFormOpen(true)}
+                  className="flex-1"
+                >
+                  {t('stock.card.verify')}
+                </Button>
+              </div>
+              
+              {/* Source link */}
+              {vehicle.sourceUrl && (
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="w-full text-xs"
+                  aria-label={`${t('stock.card.source')} pentru ${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
+                >
+                  <a
+                    href={vehicle.sourceUrl}
+                    target="_blank"
+                    rel="nofollow noopener noreferrer"
+                    title={t('stock.card.sourceTooltip')}
+                  >
+                    <ExternalLink className="h-3 w-3 mr-2" />
+                    {t('stock.card.source')} ({vehicle.sourceName || 'Sursa'})
+                  </a>
+                </Button>
+              )}
             </div>
           )}
         </CardContent>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import vehicles from '@/data/vehicles.json';
+import vehiclesData from '@/data/vehicles.json';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -10,6 +10,7 @@ export async function GET(
 ) {
   try {
     const { id } = params;
+    const vehicles = vehiclesData.vehicles;
     
     // Find vehicle by ID
     const vehicle = vehicles.find(v => v.id === id);
@@ -26,7 +27,7 @@ export async function GET(
     
     // Get related vehicles (same brand or similar price range)
     const relatedVehicles = vehicles
-      .filter(v => v.id !== id && (v.brand === vehicle.brand || Math.abs(v.price - vehicle.price) < 5000))
+      .filter(v => v.id !== id && (v.brand === vehicle.brand || Math.abs(v.priceEur - vehicle.priceEur) < 5000))
       .slice(0, 4);
     
     return NextResponse.json({

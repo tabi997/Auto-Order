@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import vehicles from '@/data/vehicles.json';
+import vehiclesData from '@/data/vehicles.json';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const vehicles = vehiclesData.vehicles;
     
     // Get filter parameters
     const brand = searchParams.get('brand');
@@ -19,7 +20,9 @@ export async function GET(request: NextRequest) {
     const priceMin = searchParams.get('priceMin');
     const priceMax = searchParams.get('priceMax');
     const country = searchParams.get('country');
-    const transmission = searchParams.get('transmission');
+    const gearbox = searchParams.get('gearbox');
+    const sortBy = searchParams.get('sortBy') || 'priceEur';
+    const sortOrder = searchParams.get('sortOrder') || 'asc';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
     
@@ -32,21 +35,43 @@ export async function GET(request: NextRequest) {
       if (yearMin && vehicle.year < parseInt(yearMin)) return false;
       if (yearMax && vehicle.year > parseInt(yearMax)) return false;
       if (kmMax && vehicle.km > parseInt(kmMax)) return false;
-      if (priceMin && vehicle.price < parseInt(priceMin)) return false;
-      if (priceMax && vehicle.price > parseInt(priceMax)) return false;
+      if (priceMin && vehicle.priceEur < parseInt(priceMin)) return false;
+      if (priceMax && vehicle.priceEur > parseInt(priceMax)) return false;
       if (country && country !== 'all' && vehicle.country !== country) return false;
-      if (transmission && transmission !== 'all' && vehicle.transmission !== transmission) return false;
+      if (gearbox && gearbox !== 'all' && vehicle.gearbox !== gearbox) return false;
       
       return true;
     });
     
-    // Get unique values for filter options
-    const brands = Array.from(new Set(vehicles.map(v => v.brand))).sort();
-    const models = Array.from(new Set(vehicles.map(v => v.model))).sort();
-    const bodies = Array.from(new Set(vehicles.map(v => v.body))).sort();
-    const fuels = Array.from(new Set(vehicles.map(v => v.fuel))).sort();
-    const countries = Array.from(new Set(vehicles.map(v => v.country))).sort();
-    const transmissions = Array.from(new Set(vehicles.map(v => v.transmission))).sort();
+    // Apply sorting
+    filteredVehicles.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (sortBy) {
+        case 'price':
+        case 'priceEur':
+          aValue = a.priceEur;
+          bValue = b.priceEur;
+          break;
+        case 'year':
+          aValue = a.year;
+          bValue = b.year;
+          break;
+        case 'km':
+          aValue = a.km;
+          bValue = b.km;
+          break;
+        default:
+          aValue = a.priceEur;
+          bValue = b.priceEur;
+      }
+      
+      if (sortOrder === 'asc') {
+        return aValue - bValue;
+      } else {
+        return bValue - aValue;
+      }
+    });
     
     // Calculate pagination
     const total = filteredVehicles.length;
@@ -55,26 +80,28 @@ export async function GET(request: NextRequest) {
     const endIndex = startIndex + limit;
     const paginatedVehicles = filteredVehicles.slice(startIndex, endIndex);
     
-    // Get min/max values for range filters
-    const years = vehicles.map(v => v.year);
-    const kms = vehicles.map(v => v.km);
-    const prices = vehicles.map(v => v.price);
-    
-    const filterOptions = {
-      brands,
-      models,
-      bodies,
-      fuels,
-      countries,
-      transmissions,
-      yearRange: { min: Math.min(...years), max: Math.max(...years) },
-      kmRange: { min: Math.min(...kms), max: Math.max(...kms) },
-      priceRange: { min: Math.min(...prices), max: Math.max(...prices) },
-    };
+    // Transform vehicles to match expected format
+    const transformedVehicles = paginatedVehicles.map(vehicle => ({
+      id: vehicle.id,
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      km: vehicle.km,
+      price: vehicle.priceEur,
+      body: vehicle.body,
+      fuel: vehicle.fuel,
+      gearbox: vehicle.gearbox,
+      country: vehicle.country,
+      image: vehicle.images?.[0] || '/api/placeholder/400/300',
+      type: (vehicle as any).type || 'BUY_NOW',
+      description: vehicle.shortDesc || vehicle.description,
+      sourceUrl: vehicle.sourceUrl,
+      sourceName: vehicle.sourceName,
+    }));
     
     return NextResponse.json({
       ok: true,
-      vehicles: paginatedVehicles,
+      vehicles: transformedVehicles,
       pagination: {
         page,
         limit,
@@ -83,7 +110,7 @@ export async function GET(request: NextRequest) {
         hasNext: page < totalPages,
         hasPrev: page > 1,
       },
-      filters: filterOptions,
+      filters: vehiclesData.filters,
     });
     
   } catch (error) {

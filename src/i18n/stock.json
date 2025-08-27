@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "title": "Explorare oportunități – AutoOrder",
+    "description": "Găsește mașina dorită din licitații B2B europene (Buy Now & Licitație). Filtrează după marcă, model, an, preț și altele."
+  },
+  "page": {
+    "title": "Explorare oportunități",
+    "subtitle": "Găsește mașina perfectă din licitații B2B europene",
+    "results": "{{count}} vehicule găsite",
+    "activeFilters": "Filtrare activă",
+    "resetAll": "Curăță toate"
+  },
+  "filters": {
+    "title": "Filtre",
+    "brand": "Brand",
+    "model": "Model",
+    "body": "Caroserie",
+    "fuel": "Combustibil",
+    "yearMin": "An minim",
+    "yearMax": "An maxim",
+    "kmMax": "Km maxim",
+    "priceMin": "Preț minim",
+    "priceMax": "Preț maxim",
+    "country": "Țară",
+    "gearbox": "Cutie",
+    "apply": "Aplică filtrele",
+    "clear": "Curăță toate"
+  },
+  "sort": {
+    "label": "Sortează după:",
+    "price": "Preț",
+    "year": "An",
+    "km": "Km",
+    "newest": "Adăugate recent"
+  },
+  "badges": {
+    "auction": "Licitație",
+    "buyNow": "Buy Now"
+  },
+  "card": {
+    "price": "€ {{value}}",
+    "details": "Vezi detalii",
+    "verify": "Solicită verificare / ofertă",
+    "from": "din {{country}}",
+    "specs": {
+      "km": "{{value}} km",
+      "fuel": "{{value}}",
+      "gearbox": "{{value}}",
+      "body": "{{value}}"
+    },
+    "source": "Vezi sursa licitației",
+    "sourceTooltip": "Deschide platforma sursă într-o fereastră nouă",
+    "noImageAlt": "Imagine indisponibilă"
+  },
+  "empty": {
+    "title": "Nu am găsit rezultate",
+    "subtitle": "Încearcă să lărgești filtrele sau scrie-ne ce cauți.",
+    "cta": "Completează brief-ul"
+  },
+  "pagination": {
+    "previous": "Înapoi",
+    "next": "Înainte"
+  },
+  "disclaimer": "Prețurile sunt orientative. Disponibilitatea se confirmă la rezervare.",
+  "security": {
+    "external": "Link extern către platforma sursă. Redirecționează spre site-ul inițial."
+  }
+}

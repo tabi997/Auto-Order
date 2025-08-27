@@ -1,33 +1,47 @@
 import { Metadata } from 'next';
-import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
 import { VehicleDetailContent } from './VehicleDetailContent';
+import { prisma } from '@/lib/prisma';
 
 interface VehicleDetailPageProps {
-  params: { id: string };
+  params: {
+    id: string;
+  };
 }
 
 export async function generateMetadata({ params }: VehicleDetailPageProps): Promise<Metadata> {
-  // In a real app, you would fetch the vehicle data here
-  // For now, we'll use a generic title
+  const listing = await prisma.listing.findUnique({
+    where: { id: params.id },
+    include: { images: true }
+  });
+  
+  if (!listing) {
+    return {
+      title: 'Vehicul negăsit | AutoOrder',
+      description: 'Vehiculul căutat nu a fost găsit.',
+    };
+  }
+
   return {
-    title: `Vehicul ${params.id} | AutoOrder`,
-    description: 'Detalii complete despre vehiculul selectat din licitațiile B2B.',
+    title: `${listing.brand} ${listing.model} ${listing.year} – AutoOrder`,
+    description: listing.shortDesc || `Vehicul ${listing.brand} ${listing.model} din ${listing.year}`,
     openGraph: {
-      title: `Vehicul ${params.id} | AutoOrder`,
-      description: 'Detalii complete despre vehiculul selectat din licitațiile B2B.',
-      images: ['/og.png'],
+      title: `${listing.brand} ${listing.model} ${listing.year}`,
+      description: listing.shortDesc || `Vehicul ${listing.brand} ${listing.model} din ${listing.year}`,
+      images: listing.images.map(img => img.url),
     },
   };
 }
 
-export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
-  return (
-    <main className="min-h-screen py-8">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <Suspense fallback={<div>Se încarcă...</div>}>
-          <VehicleDetailContent vehicleId={params.id} />
-        </Suspense>
-      </div>
-    </main>
-  );
+export default async function VehicleDetailPage({ params }: VehicleDetailPageProps) {
+  const listing = await prisma.listing.findUnique({
+    where: { id: params.id },
+    include: { images: true }
+  });
+  
+  if (!listing) {
+    notFound();
+  }
+
+  return <VehicleDetailContent listing={listing} />;
 }
