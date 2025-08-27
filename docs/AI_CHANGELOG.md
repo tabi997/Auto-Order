@@ -24,3 +24,6 @@
 
 ## 2025-08-27 20:04:25 - Implementare completă: API upload local funcțional, AdminImagesUploader actualizat, Tailwind stabilizat, build și typecheck OK
 
+
+## 2025-08-27 20:15:19 - FIX COMPLET: Tailwind CSS 4.x funcțional cu @tailwindcss/postcss, CSS se compilează corect în dev și build, site-ul se afișează cu stilizare completă
+
