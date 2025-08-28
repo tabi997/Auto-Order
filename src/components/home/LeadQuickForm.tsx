@@ -10,15 +10,9 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
-import { Loader2, CheckCircle } from 'lucide-react'
-
-const leadSchema = z.object({
-  marca_model: z.string().min(2, 'Specifică marca și modelul'),
-  buget: z.string().min(1, 'Selectează bugetul'),
-  contact: z.string().min(1, 'Introdu contactul'),
-})
-
-type LeadFormData = z.infer<typeof leadSchema>
+import { Loader2, CheckCircle, Clock, Shield } from 'lucide-react'
+import { createLead } from '@/app/actions/leads'
+import { LeadZ } from '@/schemas/vehicle'
 
 const budgetOptions = [
   { value: 'sub-5000', label: 'Sub 5.000 €' },
@@ -40,27 +34,27 @@ export default function LeadQuickForm() {
     formState: { errors },
     setValue,
     watch,
-  } = useForm<LeadFormData>({
-    resolver: zodResolver(leadSchema),
+  } = useForm({
+    resolver: zodResolver(LeadZ),
+    defaultValues: {
+      marca_model: '',
+      buget: '',
+      contact: '',
+      extra: {},
+    },
   })
 
-  const onSubmit = async (data: LeadFormData) => {
+  const onSubmit = async (data: z.infer<typeof LeadZ>) => {
     setIsSubmitting(true)
     
     try {
-      const response = await fetch('/api/leads', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
+      const result = await createLead(data, 'homepage_quick_form');
 
-      if (response.ok) {
+      if (result.ok) {
         setIsSubmitted(true)
         toast({
-          title: "Mulțumim!",
-          description: "Te contactăm în 15–30 min.",
+          title: "Mulțumim pentru solicitarea ta!",
+          description: "Te contactăm în următoarele 15-30 de minute cu oferte personalizate.",
           duration: 5000,
         })
         
@@ -73,15 +67,14 @@ export default function LeadQuickForm() {
           })
         }
       } else {
-        const errorData = await response.json()
         toast({
           title: "Eroare",
-          description: errorData.error || "A apărut o eroare. Încearcă din nou.",
+          description: result.message || "A apărut o eroare. Încearcă din nou.",
           variant: "destructive",
         })
       }
-    } catch (error) {
-      console.error('Error submitting lead:', error)
+    } catch (err) {
+      console.error('Error submitting lead:', err)
       toast({
         title: "Eroare",
         description: "A apărut o eroare. Încearcă din nou.",
@@ -121,20 +114,39 @@ export default function LeadQuickForm() {
       <div className="container mx-auto px-4">
         <Card className="max-w-md mx-auto">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Cere ofertă în 60s</CardTitle>
-            <p className="text-gray-600">
-              Spune-ne ce mașină vrei și îți oferim costul final
+            <div className="flex items-center justify-center mb-4">
+              <Clock className="h-7 w-7 text-primary mr-3" />
+              <CardTitle className="text-2xl font-bold tracking-tight">
+                Ofertă personalizată în 60s
+              </CardTitle>
+            </div>
+            <p className="text-gray-600 text-base leading-relaxed">
+              Spune-ne ce mașină vrei și îți oferim costul final garantat
             </p>
+            
+            {/* Trust indicators */}
+            <div className="flex items-center justify-center mt-5 space-x-6 text-sm text-gray-500">
+              <div className="flex items-center">
+                <Shield className="h-4 w-4 mr-2 text-primary" />
+                <span className="font-medium">Fără obligații</span>
+              </div>
+              <div className="flex items-center">
+                <Clock className="h-4 w-4 mr-2 text-primary" />
+                <span className="font-medium">Răspuns în 15-30 min</span>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
-                <Label htmlFor="marca_model">Marca și modelul dorit</Label>
+                <Label htmlFor="marca_model" className="text-sm font-semibold text-gray-700">
+                  Marca și modelul dorit
+                </Label>
                 <Input
                   id="marca_model"
                   placeholder="ex: BMW X3, Audi A4, VW Golf"
                   {...register('marca_model')}
-                  className={errors.marca_model ? 'border-red-500' : ''}
+                  className={`mt-2 ${errors.marca_model ? 'border-red-500' : 'border-gray-300'}`}
                 />
                 {errors.marca_model && (
                   <p className="text-red-500 text-sm mt-1">{errors.marca_model.message}</p>
@@ -142,9 +154,11 @@ export default function LeadQuickForm() {
               </div>
 
               <div>
-                <Label htmlFor="buget">Bugetul tău</Label>
+                <Label htmlFor="buget" className="text-sm font-semibold text-gray-700">
+                  Bugetul tău
+                </Label>
                 <Select onValueChange={(value) => setValue('buget', value)}>
-                  <SelectTrigger className={errors.buget ? 'border-red-500' : ''}>
+                  <SelectTrigger className={`mt-2 ${errors.buget ? 'border-red-500' : 'border-gray-300'}`}>
                     <SelectValue placeholder="Selectează bugetul" />
                   </SelectTrigger>
                   <SelectContent>
@@ -161,12 +175,14 @@ export default function LeadQuickForm() {
               </div>
 
               <div>
-                <Label htmlFor="contact">Telefon sau email</Label>
+                <Label htmlFor="contact" className="text-sm font-semibold text-gray-700">
+                  Telefon sau email
+                </Label>
                 <Input
                   id="contact"
                   placeholder="ex: 0722123456 sau email@example.com"
                   {...register('contact')}
-                  className={errors.contact ? 'border-red-500' : ''}
+                  className={`mt-2 ${errors.contact ? 'border-red-500' : 'border-gray-300'}`}
                 />
                 {errors.contact && (
                   <p className="text-red-500 text-sm mt-1">{errors.contact.message}</p>
@@ -175,7 +191,7 @@ export default function LeadQuickForm() {
 
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full mt-6 py-3 text-base font-semibold" 
                 disabled={isSubmitting}
                 data-analytics-id="hero_cta"
               >
@@ -185,7 +201,7 @@ export default function LeadQuickForm() {
                     Se trimite...
                   </>
                 ) : (
-                  'Cere ofertă în 60s'
+                  'Cere ofertă personalizată'
                 )}
               </Button>
             </form>

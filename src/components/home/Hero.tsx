@@ -17,12 +17,12 @@ export function Hero() {
         <div className="text-center max-w-4xl mx-auto">
           {/* Main heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-            Aduci mașina dorită din Openlane, cu cost final și comision AutoOrder
+            Mașina visurilor tale, direct din licitațiile B2B
           </h1>
           
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed">
-            Cost transparent, verificare istoric, livrare rapidă în România.
+            Preț final garantat • Istoric verificat • Livrare în România în 14-21 zile
           </p>
           
           {/* CTA buttons */}
@@ -33,8 +33,8 @@ export function Hero() {
               className="text-lg px-8 py-6"
               data-analytics-id="hero_cta"
             >
-              <Link href="#lead-quick" aria-label="Cere ofertă în 60s">
-                Cere ofertă în 60s
+              <Link href="#lead-quick" aria-label="Cere ofertă personalizată">
+                Cere ofertă personalizată
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -53,7 +53,7 @@ export function Hero() {
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
                 <Shield className="h-6 w-6 text-primary" />
               </div>
-              <div className="text-sm font-medium text-foreground">Acces licitații B2B</div>
+              <div className="text-sm font-medium text-foreground">Acces exclusiv B2B</div>
             </div>
             
             <div className="flex flex-col items-center text-center">
@@ -67,7 +67,7 @@ export function Hero() {
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
                 <Shield className="h-6 w-6 text-primary" />
               </div>
-              <div className="text-sm font-medium text-foreground">Verificare istoric</div>
+              <div className="text-sm font-medium text-foreground">Istoric verificat</div>
             </div>
             
             <div className="flex flex-col items-center text-center">

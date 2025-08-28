@@ -277,7 +277,10 @@ export async function createLead(data: any, clientIp?: string) {
     // Rate limiting
     const ip = clientIp || 'unknown'
     if (!checkRateLimit(ip)) {
-      throw new Error('Too many requests. Please try again later.')
+      return {
+        ok: false,
+        message: 'Too many requests. Please try again later.'
+      }
     }
     
     const validatedData = LeadZ.parse(data)
@@ -298,7 +301,10 @@ export async function createLead(data: any, clientIp?: string) {
         details: error.details,
         hint: error.hint
       })
-      throw new Error(`Database error: ${error.message}`)
+      return {
+        ok: false,
+        message: `Database error: ${error.message}`
+      }
     }
     
     // Send email notification (non-blocking)
@@ -306,10 +312,17 @@ export async function createLead(data: any, clientIp?: string) {
       console.error('Email notification error:', error)
     })
     
-    return lead
+    return {
+      ok: true,
+      data: lead,
+      message: 'Lead created successfully'
+    }
   } catch (error) {
     console.error('Create lead action error:', error)
-    throw error
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Unknown error occurred'
+    }
   }
 }
 

@@ -7,23 +7,23 @@ import { Euro, Shield, Search, Truck } from 'lucide-react';
 const benefits = [
   {
     icon: Euro,
-    title: "Preț final înainte de accept",
+    title: "Preț final garantat",
     description: "Știi exact costul total înainte să decizi. Fără surprize sau costuri ascunse."
   },
   {
     icon: Shield,
-    title: "Acces dealer-only (B2B)",
-    description: "Acces exclusiv la licitațiile B2B cu prețuri mai bune decât piața publică."
+    title: "Acces exclusiv dealer-only",
+    description: "Acces direct la licitațiile B2B cu prețuri cu 15-30% mai bune decât piața publică."
   },
   {
     icon: Search,
-    title: "Verificare istoric & service",
-    description: "Analizăm istoricul complet al mașinii și verificăm starea tehnică."
+    title: "Verificare completă istoric",
+    description: "Analizăm istoricul complet, rapoartele de service și starea tehnică detaliată."
   },
   {
     icon: Truck,
-    title: "Livrare 14–21 zile",
-    description: "Transport asigurat și organizare acte pentru înmatriculare în România."
+    title: "Livrare organizată complet",
+    description: "Transport asigurat, acte organizate și înmatriculare directă în România."
   }
 ];
 
@@ -33,10 +33,10 @@ export function Benefits() {
       <div className="container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <Badge variant="secondary" className="mb-4">
-            De ce AutoOrder
+            De ce să alegi AutoOrder
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Avantaje reale, nu promisiuni
+            Avantaje concrete, nu promisiuni
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Proces transparent și eficient, de la selecție până la livrare
@@ -74,7 +74,7 @@ export function Benefits() {
               Gata să începem?
             </h3>
             <p className="text-muted-foreground mb-6">
-              Spune-ne modelul dorit, bugetul și preferințele. Revenim cu 3 opțiuni potrivite.
+              Spune-ne modelul dorit, bugetul și preferințele. Revenim cu 3 opțiuni personalizate în 15-30 minute.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 

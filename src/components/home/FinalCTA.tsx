@@ -10,11 +10,11 @@ export function FinalCTA() {
       <div className="container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ai un model în minte?
+            Gata să începi să economisești?
           </h2>
           <p className="text-xl mb-8 opacity-90">
             Completează formularul și primești oferte personalizate în 15-30 minute. 
-            Fără obligații, doar informații utile.
+            Fără obligații, doar informații utile pentru decizia ta.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
@@ -25,7 +25,7 @@ export function FinalCTA() {
               className="text-lg px-8 py-6"
             >
               <Link href="#lead-quick">
-                Primește cotație în 60s
+                Primește cotație personalizată
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -33,8 +33,8 @@ export function FinalCTA() {
             <Button 
               asChild 
               size="lg" 
-              variant="outline"
-              className="text-lg px-8 py-6 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
+              variant="secondary"
+              className="text-lg px-8 py-6 bg-white text-primary hover:bg-gray-100"
             >
               <Link href="/stock">
                 Vezi stocul disponibil

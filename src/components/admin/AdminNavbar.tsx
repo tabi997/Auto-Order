@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Car, Users, LogOut } from 'lucide-react'
+import { Car, Users, Settings, LogOut } from 'lucide-react'
 import { signOutClient } from '@/lib/auth-client'
 
 export function AdminNavbar() {
@@ -44,6 +44,16 @@ export function AdminNavbar() {
                 >
                   <Users className="h-4 w-4" />
                   <span>Lead-uri</span>
+                </Button>
+              </Link>
+              
+              <Link href="/admin/settings">
+                <Button
+                  variant={isActive('/admin/settings') ? 'default' : 'ghost'}
+                  className="flex items-center space-x-2"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span>Setări</span>
                 </Button>
               </Link>
             </div>

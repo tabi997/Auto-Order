@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Hero } from '@/components/home/Hero';
 import LeadQuickForm from '@/components/home/LeadQuickForm';
 import { ProcessTimeline } from '@/components/home/ProcessTimeline';
-import { SocialProof } from '@/components/home/SocialProof';
+import { Testimonials } from '@/components/Testimonials';
 import { Benefits } from '@/components/home/Benefits';
 import { CostMiniCalculator } from '@/components/home/CostMiniCalculator';
 import FeaturedStock from '@/components/home/FeaturedStock';
@@ -10,11 +10,11 @@ import { FAQ } from '@/components/home/FAQ';
 import { FinalCTA } from '@/components/home/FinalCTA';
 
 export const metadata: Metadata = {
-  title: 'AutoOrder – Mașini la comandă din licitații B2B (Openlane)',
-  description: 'Cost total final înainte de ofertă, verificare istoric, livrare rapidă. Cere ofertă în 60s și primești mașina dorită din licitații B2B.',
+  title: 'AutoOrder – Mașina visurilor tale din licitații B2B (Openlane)',
+  description: 'Preț final garantat, istoric verificat, livrare în România în 14-21 zile. Cere ofertă personalizată în 60s și primești mașina dorită din licitații B2B cu 15-30% mai ieftin.',
   openGraph: {
-    title: 'AutoOrder – Mașini la comandă din licitații B2B',
-    description: 'Cost total final înainte de ofertă, verificare istoric, livrare rapidă. Cere ofertă în 60s.',
+    title: 'AutoOrder – Mașina visurilor tale din licitații B2B',
+    description: 'Preț final garantat, istoric verificat, livrare în România în 14-21 zile. Cere ofertă personalizată în 60s.',
     images: ['/og/autoorder.png'],
   },
 };
@@ -34,8 +34,8 @@ export default function HomePage() {
       {/* Process Timeline Section */}
       <ProcessTimeline />
       
-      {/* Social Proof Section */}
-      <SocialProof />
+      {/* Testimonials Section */}
+      <Testimonials />
       
       {/* Cost Calculator Section */}
       <section className="py-20">

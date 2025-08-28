@@ -20,12 +20,19 @@ import {
   Send,
   Target,
   Users,
-  Zap
+  Zap,
+  User,
+  Phone,
+  Mail
 } from 'lucide-react';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/lib/hooks';
+import { createLead } from '@/app/actions/leads';
 
 const SourcingFormSchema = {
+  name: '',
+  phone: '',
+  email: '',
   brand: '',
   model: '',
   budget: '',
@@ -48,6 +55,12 @@ export function SourcingContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Basic validation
+    if (!formData.name || !formData.phone || !formData.email) {
+      error('Te rugăm să completezi toate câmpurile obligatorii');
+      return;
+    }
+
     if (!formData.gdpr) {
       error('Trebuie să fii de acord cu GDPR');
       return;
@@ -55,32 +68,35 @@ export function SourcingContent() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/leads', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: 'Sourcing Brief',
-          phone: 'N/A',
-          email: 'sourcing@autoorder.ro',
+      const result = await createLead({
+        marca_model: `${formData.brand} ${formData.model}`.trim() || 'Sourcing Brief',
+        buget: formData.budget ? `${formData.budget} EUR` : 'Contact pentru ofertă',
+        contact: `${formData.name} - ${formData.phone} - ${formData.email}`,
+        extra: {
           requestType: 'offer',
           message: `Sourcing brief: ${formData.brand} ${formData.model}, buget: ${formData.budget}EUR, an: ${formData.yearMin}+, km: ${formData.kmMax}-, preferințe: ${formData.preferences}`,
           gdpr: formData.gdpr,
           source: 'sourcing_page',
-        }),
-      });
-
-      const result = await response.json();
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          brand: formData.brand,
+          model: formData.model,
+          budget: formData.budget,
+          yearMin: formData.yearMin,
+          kmMax: formData.kmMax,
+          preferences: formData.preferences,
+        },
+      }, 'sourcing_page');
 
       if (result.ok) {
-        success('Brief-ul a fost trimis cu succes! Vom reveni în cel mai scurt timp.');
+        success('Cererea ta a fost trimisă cu succes! Vom reveni în cel mai scurt timp cu o ofertă personalizată.');
         setFormData(SourcingFormSchema);
       } else {
-        error(result.message || 'A apărut o eroare la trimiterea brief-ului');
+        error(result.message || 'A apărut o eroare la trimiterea cererii');
       }
     } catch (err) {
-      error('A apărut o eroare la trimiterea brief-ului');
+      error('A apărut o eroare la trimiterea cererii');
       console.error('Error submitting sourcing brief:', err);
     } finally {
       setIsSubmitting(false);
@@ -181,88 +197,143 @@ export function SourcingContent() {
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center gap-2">
               <Zap className="h-6 w-6" />
-              {t('sourcing.quickBrief')}
+              Spune-ne ce vrei
             </CardTitle>
             <p className="text-muted-foreground">
               Completează rapid ce vrei și îți facem o ofertă personalizată
             </p>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('sourcing.briefForm.brand')}
-                  </label>
-                  <Input
-                    placeholder="ex: BMW, Mercedes, Audi..."
-                    value={formData.brand}
-                    onChange={(e) => handleInputChange('brand', e.target.value)}
-                  />
-                </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Personal Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Informații personale
+                </h3>
                 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('sourcing.briefForm.model')}
-                  </label>
-                  <Input
-                    placeholder="ex: X5, C-Class, A4..."
-                    value={formData.model}
-                    onChange={(e) => handleInputChange('model', e.target.value)}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Nume complet *
+                    </label>
+                    <Input
+                      placeholder="Numele tău complet"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Telefon *
+                    </label>
+                    <Input
+                      placeholder="+40 123 456 789"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Email *
+                    </label>
+                    <Input
+                      type="email"
+                      placeholder="email@example.com"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('sourcing.briefForm.budget')} (EUR)
-                  </label>
-                  <Input
-                    type="number"
-                    placeholder="25000"
-                    value={formData.budget}
-                    onChange={(e) => handleInputChange('budget', e.target.value)}
-                  />
+
+              {/* Vehicle Details */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Detalii vehicul
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      {t('sourcing.briefForm.brand')}
+                    </label>
+                    <Input
+                      placeholder="ex: BMW, Mercedes, Audi..."
+                      value={formData.brand}
+                      onChange={(e) => handleInputChange('brand', e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      {t('sourcing.briefForm.model')}
+                    </label>
+                    <Input
+                      placeholder="ex: X5, C-Class, A4..."
+                      value={formData.model}
+                      onChange={(e) => handleInputChange('model', e.target.value)}
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      {t('sourcing.briefForm.budget')} (EUR)
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="25000"
+                      value={formData.budget}
+                      onChange={(e) => handleInputChange('budget', e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      {t('sourcing.briefForm.yearMin')}
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="2018"
+                      min="2000"
+                      max="2024"
+                      value={formData.yearMin}
+                      onChange={(e) => handleInputChange('yearMin', e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      {t('sourcing.briefForm.kmMax')}
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="100000"
+                      value={formData.kmMax}
+                      onChange={(e) => handleInputChange('kmMax', e.target.value)}
+                    />
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    {t('sourcing.briefForm.yearMin')}
+                    {t('sourcing.briefForm.preferences')}
                   </label>
-                  <Input
-                    type="number"
-                    placeholder="2018"
-                    min="2000"
-                    max="2024"
-                    value={formData.yearMin}
-                    onChange={(e) => handleInputChange('yearMin', e.target.value)}
+                  <Textarea
+                    placeholder="Descrie preferințele tale: combustibil, cutie de viteze, dotări, culoare, etc."
+                    rows={3}
+                    value={formData.preferences}
+                    onChange={(e) => handleInputChange('preferences', e.target.value)}
                   />
                 </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t('sourcing.briefForm.kmMax')}
-                  </label>
-                  <Input
-                    type="number"
-                    placeholder="100000"
-                    value={formData.kmMax}
-                    onChange={(e) => handleInputChange('kmMax', e.target.value)}
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t('sourcing.briefForm.preferences')}
-                </label>
-                <Textarea
-                  placeholder="Descrie preferințele tale: combustibil, cutie de viteze, dotări, culoare, etc."
-                  rows={3}
-                  value={formData.preferences}
-                  onChange={(e) => handleInputChange('preferences', e.target.value)}
-                />
               </div>
               
               <div className="space-y-2">
@@ -283,7 +354,7 @@ export function SourcingContent() {
               
               <Button
                 type="submit"
-                disabled={!formData.gdpr || isSubmitting}
+                disabled={!formData.gdpr || isSubmitting || !formData.name || !formData.phone || !formData.email}
                 className="w-full"
                 size="lg"
               >
@@ -295,7 +366,7 @@ export function SourcingContent() {
                 ) : (
                   <div className="flex items-center gap-2">
                     <Send className="h-4 w-4" />
-                    Trimite brief-ul
+                    Trimite cererea
                   </div>
                 )}
               </Button>

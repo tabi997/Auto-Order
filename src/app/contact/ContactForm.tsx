@@ -31,6 +31,8 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '@/i18n';
 import { useToastContext } from '@/components/ToastProvider';
+import { submitContactForm } from '@/app/actions/contact';
+import { useSettings } from '@/hooks/useSettings';
 
 // Enhanced contact form schema
 const ContactFormSchema = z.object({
@@ -86,8 +88,8 @@ const ContactFormSchema = z.object({
 
 type ContactFormData = z.infer<typeof ContactFormSchema>;
 
-// Contact information data
-const contactInfo = {
+// Contact information data - will be overridden by settings from database
+const defaultContactInfo = {
   email: 'contact@autoorder.ro',
   phone: '+40 123 456 789',
   address: 'București, România',
@@ -126,6 +128,7 @@ export function ContactForm({ defaultRequestType = 'offer', onSuccess }: Contact
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const { success, error } = useToastContext();
+  const { settings } = useSettings();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showVehicleFields, setShowVehicleFields] = useState(false);
 
@@ -201,15 +204,13 @@ export function ContactForm({ defaultRequestType = 'offer', onSuccess }: Contact
         },
       };
 
-      const response = await fetch('/api/leads', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(leadData),
+      const result = await submitContactForm({
+        requestType: data.requestType,
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        message: data.message
       });
-
-      const result = await response.json();
 
       if (result.ok) {
         success(result.message || 'Mesajul a fost trimis cu succes!');
@@ -607,10 +608,10 @@ export function ContactForm({ defaultRequestType = 'offer', onSuccess }: Contact
               <div>
                 <p className="text-sm text-muted-foreground">Email</p>
                 <a 
-                  href={`mailto:${contactInfo.email}`}
+                  href={`mailto:${settings?.contact_info?.contact?.email || defaultContactInfo.email}`}
                   className="font-medium text-primary hover:underline"
                 >
-                  {contactInfo.email}
+                  {settings?.contact_info?.contact?.email || defaultContactInfo.email}
                 </a>
               </div>
             </div>
@@ -620,10 +621,10 @@ export function ContactForm({ defaultRequestType = 'offer', onSuccess }: Contact
               <div>
                 <p className="text-sm text-muted-foreground">Telefon</p>
                 <a 
-                  href={`tel:${contactInfo.phone}`}
+                  href={`tel:${settings?.contact_info?.contact?.phone || defaultContactInfo.phone}`}
                   className="font-medium text-primary hover:underline"
                 >
-                  {contactInfo.phone}
+                  {settings?.contact_info?.contact?.phone || defaultContactInfo.phone}
                 </a>
               </div>
             </div>
@@ -632,7 +633,12 @@ export function ContactForm({ defaultRequestType = 'offer', onSuccess }: Contact
               <MapPin className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="text-sm text-muted-foreground">Adresă</p>
-                <p className="font-medium">{contactInfo.address}</p>
+                <p className="font-medium">
+                  {settings?.contact_info?.contact?.address 
+                    ? `${settings.contact_info.contact.address}, ${settings.contact_info.contact.city}`
+                    : defaultContactInfo.address
+                  }
+                </p>
               </div>
             </div>
             
@@ -640,7 +646,12 @@ export function ContactForm({ defaultRequestType = 'offer', onSuccess }: Contact
               <Clock className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="text-sm text-muted-foreground">Program</p>
-                <p className="font-medium">{contactInfo.schedule}</p>
+                <p className="font-medium">
+                  {settings?.contact_info?.schedule?.monday 
+                    ? `Luni-Vineri ${settings.contact_info.schedule.monday}`
+                    : defaultContactInfo.schedule
+                  }
+                </p>
               </div>
             </div>
           </CardContent>
@@ -696,7 +707,12 @@ export function ContactForm({ defaultRequestType = 'offer', onSuccess }: Contact
               <div className="text-center text-muted-foreground">
                 <MapPin className="h-12 w-12 mx-auto mb-2" />
                 <p className="text-sm">Hartă va fi afișată aici</p>
-                <p className="text-xs">{contactInfo.address}</p>
+                <p className="text-xs">
+                  {settings?.contact_info?.contact?.address 
+                    ? `${settings.contact_info.contact.address}, ${settings.contact_info.contact.city}`
+                    : defaultContactInfo.address
+                  }
+                </p>
               </div>
             </div>
           </CardContent>

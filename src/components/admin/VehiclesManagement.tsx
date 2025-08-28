@@ -14,6 +14,7 @@ import { AdminImagesUploader } from '@/components/AdminImagesUploader'
 import { Car, Plus, Edit, Trash2, Star, Eye, ExternalLink } from 'lucide-react'
 import { VehicleZ } from '@/schemas/vehicle'
 import Link from 'next/link'
+import { getAdminVehicles, createAdminVehicle, updateAdminVehicle, deleteAdminVehicle } from '@/app/actions/admin'
 
 interface Vehicle {
   id: string
@@ -59,8 +60,7 @@ export default function VehiclesManagement() {
 
   const fetchVehicles = async () => {
     try {
-      const response = await fetch('/api/admin/vehicles')
-      const data = await response.json()
+      const data = await getAdminVehicles()
       setVehicles(data.data || [])
     } catch (error) {
       toast({
@@ -73,38 +73,47 @@ export default function VehiclesManagement() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    const validatedData = VehicleZ.parse(formData)
+    
+    // Map schema fields to database structure
+    const vehicleData = {
+      make: validatedData.make,
+      model: validatedData.model,
+      year: validatedData.year,
+      km: validatedData.km,
+      fuel: validatedData.fuel,
+      transmission: validatedData.transmission,
+      price_est: validatedData.price_est,
+      badges: validatedData.badges || [],
+      images: validatedData.images || [],
+      source: validatedData.source || '',
+      featured: validatedData.featured || false,
+      featured_position: validatedData.featured_position || 0,
+    }
+    
     try {
-      const validatedData = VehicleZ.parse(formData)
-      const url = editingVehicle 
-        ? `/api/admin/vehicles/${editingVehicle.id}`
-        : '/api/admin/vehicles'
-      
-      const method = editingVehicle ? 'PUT' : 'POST'
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validatedData)
-      })
-
-      if (!response.ok) throw new Error('Eroare la salvare')
+      if (editingVehicle) {
+        await updateAdminVehicle(editingVehicle.id, vehicleData)
+      } else {
+        await createAdminVehicle(vehicleData)
+      }
 
       toast({
         title: "Succes",
-        description: editingVehicle ? "Vehicul actualizat" : "Vehicul adăugat",
+        description: editingVehicle ? "Vehicul actualizat" : "Vehicul creat",
       })
-
+      
       setIsDialogOpen(false)
-      setEditingVehicle(null)
       resetForm()
       fetchVehicles()
     } catch (error) {
+      console.error('Error saving vehicle:', error)
       toast({
         title: "Eroare",
-        description: "Date invalide sau eroare la salvare",
+        description: "Nu s-a putut salva vehiculul",
         variant: "destructive",
       })
     }
@@ -133,11 +142,7 @@ export default function VehiclesManagement() {
     if (!confirm('Ești sigur că vrei să ștergi acest vehicul?')) return
 
     try {
-      const response = await fetch(`/api/admin/vehicles/${id}`, {
-        method: 'DELETE'
-      })
-
-      if (!response.ok) throw new Error('Eroare la ștergere')
+      await deleteAdminVehicle(id)
 
       toast({
         title: "Succes",
@@ -156,27 +161,18 @@ export default function VehiclesManagement() {
 
   const handleToggleFeatured = async (vehicle: Vehicle) => {
     try {
-      const response = await fetch(`/api/admin/vehicles/${vehicle.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...vehicle,
-          featured: !vehicle.featured
-        })
+      await updateAdminVehicle(vehicle.id, {
+        featured: !vehicle.featured
       })
-
-      if (!response.ok) throw new Error('Eroare la actualizare')
-
       toast({
         title: "Succes",
-        description: vehicle.featured ? "Vehicul eliminat din featured" : "Vehicul adăugat în featured",
+        description: "Status featured actualizat",
       })
-
       fetchVehicles()
     } catch (error) {
       toast({
         title: "Eroare",
-        description: "Nu s-a putut actualiza vehiculul",
+        description: "Nu s-a putut actualiza statusul",
         variant: "destructive",
       })
     }
@@ -238,7 +234,7 @@ export default function VehiclesManagement() {
                 {editingVehicle ? 'Editează Vehicul' : 'Adaugă Vehicul Nou'}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={onSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="make">Marcă *</Label>

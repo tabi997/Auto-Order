@@ -18,21 +18,21 @@ FOR INSERT WITH CHECK (true);
 -- Policy 2: Admin users can read all leads
 CREATE POLICY "admin can read leads" ON public.leads
 FOR SELECT USING (
-  (auth.jwt()->>'user_metadata') like '%"role":"admin"%'
+  (auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin'
 );
 
 -- Policy 3: Admin users can update leads
 CREATE POLICY "admin can update leads" ON public.leads
 FOR UPDATE USING (
-  (auth.jwt()->>'user_metadata') like '%"role":"admin"%'
+  (auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin'
 ) WITH CHECK (
-  (auth.jwt()->>'user_metadata') like '%"role":"admin"%'
+  (auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin'
 );
 
 -- Policy 4: Admin users can delete leads
 CREATE POLICY "admin can delete leads" ON public.leads
 FOR DELETE USING (
-  (auth.jwt()->>'user_metadata') like '%"role":"admin"%'
+  (auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin'
 );
 
 -- Verify the policies were created

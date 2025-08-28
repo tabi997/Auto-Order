@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { X, Send, User, Phone, Mail, MessageSquare, Euro } from 'lucide-react';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/lib/hooks';
+import { createLead } from '@/app/actions/leads';
 
 const LeadFormSchema = z.object({
   name: z.string().min(2, 'Numele trebuie să aibă cel puțin 2 caractere'),
@@ -71,18 +72,10 @@ export function LeadForm({
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/leads', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...data,
-          budget: data.budget ? parseFloat(data.budget) : undefined,
-        }),
-      });
-
-      const result = await response.json();
+      const result = await createLead({
+        ...data,
+        budget: data.budget ? parseFloat(data.budget) : undefined,
+      }, 'lead_form');
 
       if (result.ok) {
         success(result.message || 'Solicitarea a fost trimisă cu succes!');

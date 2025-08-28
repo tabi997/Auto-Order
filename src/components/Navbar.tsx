@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button'
 import { QuickSearch } from '@/components/QuickSearch'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { ValuationModal } from '@/components/ValuationModal'
+import { AdminButton } from '@/components/AdminButton'
 import { Car, Menu, X } from 'lucide-react'
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isValuationModalOpen, setIsValuationModalOpen] = useState(false)
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -70,6 +72,9 @@ export function Navbar() {
               
               {/* Action Buttons */}
               <div className="flex items-center space-x-3 lg:space-x-4">
+                {/* Admin Button */}
+                <AdminButton />
+                
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -139,6 +144,11 @@ export function Navbar() {
               
               {/* Divider */}
               <div className="w-full h-px bg-border/60 mb-6" />
+              
+              {/* Admin Button */}
+              <div onClick={() => setIsMobileMenuOpen(false)}>
+                <AdminButton mobile />
+              </div>
               
               {/* Action Button */}
               <Button 

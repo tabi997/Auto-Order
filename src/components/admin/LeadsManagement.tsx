@@ -7,8 +7,9 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
-import { Users, Phone, Mail, Calendar, MessageSquare, Search, Filter, Eye, Download } from 'lucide-react'
+import { Users, Phone, Mail, Calendar, MessageSquare, Search, Filter, Eye, Download, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { getAdminLeads, updateLeadStatus, deleteAdminLead } from '@/app/actions/admin'
 
 interface Lead {
   id: string
@@ -26,6 +27,7 @@ export default function LeadsManagement() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [deletingLeadId, setDeletingLeadId] = useState<string | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -38,8 +40,7 @@ export default function LeadsManagement() {
 
   const fetchLeads = async () => {
     try {
-      const response = await fetch('/api/admin/leads')
-      const data = await response.json()
+      const data = await getAdminLeads()
       setLeads(data.data || [])
     } catch (error) {
       toast({
@@ -72,28 +73,88 @@ export default function LeadsManagement() {
     setFilteredLeads(filtered)
   }
 
-  const updateLeadStatus = async (id: string, status: string) => {
+  const handleUpdateLeadStatus = async (id: string, status: string) => {
+    // Store the current leads state for potential rollback
+    const previousLeads = [...leads]
+    
     try {
-      const response = await fetch(`/api/admin/leads/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
-      })
+      console.log('Updating lead status:', { id, status })
+      
+      // Validate status locally first
+      const validStatuses = ['new', 'qualified', 'quoted', 'approved', 'ordered', 'delivered']
+      if (!validStatuses.includes(status)) {
+        toast({
+          title: "Eroare",
+          description: `Status invalid: ${status}`,
+          variant: "destructive",
+        })
+        return
+      }
 
-      if (!response.ok) throw new Error('Eroare la actualizare')
+      // Optimistically update the UI first
+      setLeads(prevLeads => 
+        prevLeads.map(lead => 
+          lead.id === id ? { ...lead, status } : lead
+        )
+      )
+
+      // Call the server action
+      await updateLeadStatus(id, status)
 
       toast({
         title: "Succes",
-        description: "Status actualizat",
+        description: "Status actualizat cu succes",
       })
 
-      fetchLeads()
-    } catch (error) {
+      // No need to update state again since we did it optimistically
+    } catch (error: any) {
+      console.error('Error updating lead status:', error)
+      
+      // Revert the optimistic update on error
+      setLeads(previousLeads)
+      
       toast({
         title: "Eroare",
-        description: "Nu s-a putut actualiza statusul",
+        description: error.message || "Nu s-a putut actualiza statusul",
         variant: "destructive",
       })
+    }
+  }
+
+  const handleDeleteLead = async (id: string) => {
+    const lead = leads.find(l => l.id === id)
+    if (!lead) return
+    
+    const confirmMessage = `Ești sigur că vrei să ștergi lead-ul "${lead.marca_model}"?\n\nAceastă acțiune nu poate fi anulată.`
+    
+    if (!confirm(confirmMessage)) {
+      return
+    }
+
+    setDeletingLeadId(id)
+    
+    try {
+      console.log('Deleting lead:', { id, marca_model: lead.marca_model })
+      
+      // Call the delete action
+      await deleteAdminLead(id)
+
+      toast({
+        title: "Succes",
+        description: `Lead "${lead.marca_model}" șters cu succes`,
+      })
+
+      // Remove from local state
+      setLeads(prevLeads => prevLeads.filter(lead => lead.id !== id))
+    } catch (error: any) {
+      console.error('Error deleting lead:', error)
+      toast({
+        title: "Eroare",
+        description: `Nu s-a putut șterge lead-ul: ${error.message}`,
+        variant: "destructive",
+      })
+    } finally {
+      setDeletingLeadId(null)
     }
   }
 
@@ -337,7 +398,7 @@ export default function LeadsManagement() {
                 </div>
 
                 <div className="flex flex-col space-y-2 ml-4">
-                  <Select value={lead.status} onValueChange={(value) => updateLeadStatus(lead.id, value)}>
+                  <Select value={lead.status} onValueChange={(value) => handleUpdateLeadStatus(lead.id, value)}>
                     <SelectTrigger className="w-32">
                       <SelectValue />
                     </SelectTrigger>
@@ -356,6 +417,20 @@ export default function LeadsManagement() {
                       <Eye className="h-4 w-4 mr-1" />
                       Vezi detalii
                     </Link>
+                  </Button>
+
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleDeleteLead(lead.id)}
+                    disabled={deletingLeadId === lead.id}
+                  >
+                    {deletingLeadId === lead.id ? (
+                      <div className="animate-spin h-4 w-4" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                    Șterge lead
                   </Button>
                 </div>
               </div>

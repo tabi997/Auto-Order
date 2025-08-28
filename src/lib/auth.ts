@@ -2,51 +2,86 @@ import { createClient } from './supabase/server'
 import { redirect } from 'next/navigation'
 
 export async function requireAdmin() {
-  console.log('🔐 requireAdmin called')
-  
   const supabase = createClient()
   
-  const { data: { user }, error } = await supabase.auth.getUser()
-  
-  console.log('👤 Auth result:', { 
-    hasUser: !!user, 
-    userId: user?.id,
-    hasError: !!error,
-    error: error?.message 
-  })
-  
-  if (error || !user) {
-    console.log('❌ No user found, redirecting to login')
+  try {
+    console.log('🔐 requireAdmin - Start authentication check');
+    
+    const { data: { user }, error } = await supabase.auth.getUser()
+    
+    console.log('👤 User data:', {
+      hasUser: !!user,
+      userId: user?.id,
+      email: user?.email,
+      hasError: !!error
+    });
+    
+    if (error) {
+      console.log('❌ Auth error:', error.message);
+      redirect('/admin/login')
+    }
+    
+    if (!user) {
+      console.log('❌ No user found');
+      redirect('/admin/login')
+    }
+    
+    const userMetadata = user.user_metadata
+    console.log('🏷️ User metadata:', {
+      hasMetadata: !!userMetadata,
+      role: userMetadata?.role,
+      allMetadata: userMetadata
+    });
+    
+    if (userMetadata?.role !== 'admin') {
+      console.log('❌ User is not admin. Role:', userMetadata?.role);
+      redirect('/admin/login')
+    }
+    
+    console.log('✅ Admin check passed successfully');
+    return user
+  } catch (error) {
+    console.error('❌ Auth error in requireAdmin:', error)
     redirect('/admin/login')
   }
-  
-  const userMetadata = user.user_metadata
-  console.log('📋 User metadata:', userMetadata)
-  
-  if (userMetadata?.role !== 'admin') {
-    console.log('❌ User is not admin, redirecting to login')
-    redirect('/admin/login')
-  }
-  
-  console.log('✅ Admin user verified:', user.id)
-  return user
 }
 
 export async function getCurrentUser() {
   const supabase = createClient()
   
-  const { data: { user }, error } = await supabase.auth.getUser()
-  
-  if (error || !user) {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    
+    if (error || !user) {
+      return null
+    }
+    
+    return user
+  } catch (error) {
+    console.error('Error getting current user:', error)
     return null
   }
-  
-  return user
 }
 
 // Server-side signOut function
 export async function signOut() {
   const supabase = createClient()
-  await supabase.auth.signOut()
-  redirect('/admin/login')
+  
+  try {
+    await supabase.auth.signOut()
+    redirect('/admin/login')
+  } catch (error) {
+    console.error('Error during sign out:', error)
+    redirect('/admin/login')
+  }
+}
+
+// Utility function to check if user has admin role
+export function hasAdminRole(user: any): boolean {
+  return user?.user_metadata?.role === 'admin'
+}
+
+// Utility function to check if user has any role
+export function hasRole(user: any, role: string): boolean {
+  return user?.user_metadata?.role === role
 }

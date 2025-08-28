@@ -5,7 +5,6 @@ export const UPLOAD_CONFIG = {
   
   // Local storage settings
   local: {
-    uploadEndpoint: '/api/upload/local',
     maxFileSize: 4 * 1024 * 1024, // 4MB
     maxFileCount: 8,
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
@@ -14,7 +13,6 @@ export const UPLOAD_CONFIG = {
   
   // Cloud storage settings (UploadThing)
   cloud: {
-    uploadEndpoint: '/api/uploadthing',
     maxFileSize: 4 * 1024 * 1024, // 4MB
     maxFileCount: 8,
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],

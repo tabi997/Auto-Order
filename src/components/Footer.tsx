@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Car, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useHomeTranslation } from '@/i18n';
+import { useSettings } from '@/hooks/useSettings';
 
 interface FooterItem {
   name: string;
@@ -50,6 +51,7 @@ const footerMenus: FooterMenu[] = [
 
 export function Footer() {
   const { t } = useHomeTranslation();
+  const { settings } = useSettings();
 
   return (
     <footer className="bg-muted/50 border-t">
@@ -78,26 +80,31 @@ export function Footer() {
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <Mail className="h-4 w-4" />
                   <a 
-                    href="mailto:contact@autoorder.ro" 
+                    href={`mailto:${settings?.contact_info?.contact?.email || 'contact@autoorder.ro'}`}
                     className="hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     aria-label="Trimite email la AutoOrder"
                   >
-                    {t('footer.contact.email')}
+                    {settings?.contact_info?.contact?.email || t('footer.contact.email')}
                   </a>
                 </div>
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <Phone className="h-4 w-4" />
                   <a 
-                    href="tel:+40123456789" 
+                    href={`tel:${settings?.contact_info?.contact?.phone || '+40123456789'}`}
                     className="hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     aria-label="Sună la AutoOrder"
                   >
-                    {t('footer.contact.phone')}
+                    {settings?.contact_info?.contact?.phone || t('footer.contact.phone')}
                   </a>
                 </div>
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4" />
-                  <span>{t('footer.contact.address')}</span>
+                  <span>
+                    {settings?.contact_info?.contact?.address 
+                      ? `${settings.contact_info.contact.address}, ${settings.contact_info.contact.city}`
+                      : t('footer.contact.address')
+                    }
+                  </span>
                 </div>
               </div>
             </div>
