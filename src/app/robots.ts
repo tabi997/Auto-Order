@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/temp/'],
+      disallow: ['/temp/'],
     },
     sitemap: 'https://autoorder.ro/sitemap.xml',
   }

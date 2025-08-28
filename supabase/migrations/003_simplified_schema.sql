@@ -32,8 +32,8 @@ create policy "admin can read own profile" on public.admin_users
 for select using (auth.uid()::text = id::text);
 
 create policy "admin can manage admin_users" on public.admin_users
-for all using ((auth.jwt()->>'user_metadata') like '%"role":"admin"%')
-with check ((auth.jwt()->>'user_metadata') like '%"role":"admin"%');
+for all using ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin')
+with check ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin');
 
 -- Create trigger for updated_at
 create trigger update_admin_users_updated_at

@@ -7,23 +7,23 @@ import { Search, Car, CheckCircle, Truck } from 'lucide-react';
 const steps = [
   {
     icon: Search,
-    title: "Selectezi modelul",
-    description: "Ne spui marca, modelul, bugetul și preferințele tale"
+    title: "Spune-ne ce vrei",
+    description: "Ne dai marca, modelul, bugetul și preferințele tale specifice"
   },
   {
     icon: Car,
-    title: "Găsim mașini în Openlane",
-    description: "Căutăm în licitațiile B2B și selectăm cele mai potrivite opțiuni"
+    title: "Căutăm în licitații",
+    description: "Scanez licitațiile B2B și selectez cele mai potrivite opțiuni pentru tine"
   },
   {
     icon: CheckCircle,
-    title: "Verificăm & dăm cost total",
-    description: "Analizăm istoricul, verificăm starea și calculăm costul final"
+    title: "Verificăm & calculăm",
+    description: "Analizez istoricul complet, verific starea și calculez costul final exact"
   },
   {
     icon: Truck,
-    title: "Livrare + acte în România",
-    description: "Organizăm transportul și înmatricularea în România"
+    title: "Livrare & înmatriculare",
+    description: "Organizez transportul și toate actele pentru înmatricularea în România"
   }
 ];
 
@@ -36,7 +36,7 @@ export function ProcessTimeline() {
             Cum funcționează
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Proces în 4 pași simpli
+            Proces simplu în 4 pași
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             De la cererea ta până la livrarea mașinii, totul este transparent și eficient
@@ -85,7 +85,7 @@ export function ProcessTimeline() {
         {/* CTA */}
         <div className="text-center mt-16">
           <p className="text-lg text-muted-foreground mb-6">
-            Gata să începem? Completează formularul de mai sus și primești oferte în 15-30 minute.
+            Gata să începem? Completează formularul de mai sus și primești oferte personalizate în 15-30 minute.
           </p>
         </div>
       </div>

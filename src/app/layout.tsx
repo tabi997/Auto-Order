@@ -5,7 +5,9 @@ import { Header } from "@/components/Header"
 import { Footer } from "@/components/Footer"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { ToastProvider } from "@/components/ToastProvider"
+import { AuthProvider } from "@/lib/auth-context"
 import { FloatingContactButton } from "@/components/ContactModal"
+import { Toaster } from "@/components/ui/toaster"
 
 import Script from "next/script"
 
@@ -65,7 +67,7 @@ export const metadata: Metadata = {
   },
 }
 
-// Schema.org Organization JSON-LD
+// Schema.org Organization JSON-LD - will be dynamically updated with settings
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -110,14 +112,17 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ToastProvider>
-            <div className="min-h-screen flex flex-col">
-              <Header />
-              <main className="flex-1">
-                {children}
-              </main>
-              <Footer />
-              <FloatingContactButton />
-            </div>
+            <AuthProvider>
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+                <FloatingContactButton />
+                <Toaster />
+              </div>
+            </AuthProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

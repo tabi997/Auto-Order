@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { uploadLocal } from '@/app/actions/upload';
 
 interface ImageData {
   id?: string;
@@ -67,20 +68,11 @@ export function LocalImageUploader({
       // Add listingId for organization (use temp ID if not available)
       formData.append('listingId', listingId || 'temp-' + Date.now());
       
-      const response = await fetch('/api/uploads', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      const result = await response.json();
+      const result = await uploadLocal(Array.from(files));
       
       if (result.success) {
-        const newImages: ImageData[] = result.urls.map((url: string) => ({
-          url: url,
+        const newImages: ImageData[] = result.files.map((file: any) => ({
+          url: file.url,
           alt: '',
         }));
         
@@ -96,7 +88,7 @@ export function LocalImageUploader({
         
         toast({
           title: "Upload successful",
-          description: `${result.urls.length} image(s) uploaded`,
+          description: `${result.files.length} image(s) uploaded`,
         });
       }
     } catch (error) {

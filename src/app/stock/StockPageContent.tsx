@@ -11,6 +11,7 @@ import { useTranslation } from '@/i18n';
 import { useQueryParams } from '@/lib/hooks';
 import { StockSchema } from '@/components/StockSchema';
 import { ApiVehicle, FilterOptions } from '@/types/vehicle';
+import { getStock } from '@/app/actions/stock';
 
 type SortField = 'price' | 'year' | 'km';
 type SortOrder = 'asc' | 'desc';
@@ -71,8 +72,23 @@ export function StockPageContent() {
         }
       });
       
-      const response = await fetch(`/api/stock?${params.toString()}`);
-      const data = await response.json();
+      const data = await getStock({
+        page: currentPage,
+        limit: 12,
+        sortBy: sortField,
+        sortOrder: sortOrder,
+        brand: getParam('brand') || '',
+        model: getParam('model') || '',
+        body: getParam('body') || '',
+        fuel: getParam('fuel') || '',
+        yearMin: getParam('yearMin') || '',
+        yearMax: getParam('yearMax') || '',
+        kmMax: getParam('kmMax') || '',
+        priceMin: getParam('priceMin') || '',
+        priceMax: getParam('priceMax') || '',
+        country: getParam('country') || '',
+        gearbox: getParam('gearbox') || '',
+      });
       
       if (data.listings) {
         setVehicles(data.listings);

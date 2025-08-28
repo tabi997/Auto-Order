@@ -135,7 +135,7 @@ export const en = {
     subtitle: "Transparent and guaranteed B2B auctions",
     process: "Our process",
     questions: "Frequently asked questions for sourcing",
-    quickBrief: "Quick brief",
+    quickBrief: "Tell us what you want",
     briefForm: {
       brand: "Brand",
       model: "Model",

@@ -46,15 +46,15 @@ for select using (true);
 
 -- doar admin poate modifica vehicles
 create policy "admin can modify vehicles" on public.vehicles
-for all using ((auth.jwt()->>'user_metadata') like '%"role":"admin"%')
-with check ((auth.jwt()->>'user_metadata') like '%"role":"admin"%');
+for all using ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin')
+with check ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin');
 
 -- leads: oricine poate insera; doar admin poate citi
 create policy "anyone can insert leads" on public.leads
 for insert with check (true);
 
 create policy "admin can read leads" on public.leads
-for select using ((auth.jwt()->>'user_metadata') like '%"role":"admin"%');
+for select using ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin');
 
 -- Create function to update updated_at timestamp
 create or replace function update_updated_at_column()

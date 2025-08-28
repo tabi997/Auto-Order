@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Calculator, ArrowRight } from 'lucide-react';
+import { Calculator, ArrowRight, Info } from 'lucide-react';
 
 interface CalculationResult {
   auctionPrice: number;
@@ -66,8 +66,11 @@ export function CostMiniCalculator() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calculator className="h-5 w-5" />
-          Calculator estimativ
+          Calculator estimativ de costuri
         </CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Estimează costul total pentru mașina dorită
+        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Inputs */}
@@ -83,7 +86,7 @@ export function CostMiniCalculator() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="country">Țara</Label>
+          <Label htmlFor="country">Țara de origine</Label>
           <Select value={country} onValueChange={setCountry}>
             <SelectTrigger>
               <SelectValue placeholder="Selectează țara" />
@@ -115,7 +118,7 @@ export function CostMiniCalculator() {
                 <span className="font-medium">{result.auctionPrice.toLocaleString()} €</span>
               </div>
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Transport:</span>
+                <span>Transport asigurat:</span>
                 <span>{result.transport.toLocaleString()} €</span>
               </div>
               <div className="flex justify-between text-sm text-muted-foreground">
@@ -127,7 +130,7 @@ export function CostMiniCalculator() {
                 <span>{result.taxes.toLocaleString()} €</span>
               </div>
               <div className="flex justify-between text-lg font-semibold pt-2 border-t">
-                <span>Cost total:</span>
+                <span>Cost total estimat:</span>
                 <span className="text-primary">{result.total.toLocaleString()} €</span>
               </div>
             </div>
@@ -136,13 +139,16 @@ export function CostMiniCalculator() {
               onClick={handleGetOffer}
               className="w-full"
             >
-              Cere ofertă cu acești parametri
+              Cere ofertă personalizată
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
 
-            <p className="text-xs text-muted-foreground text-center">
-              Rezultatul este orientativ. Costurile finale depind de sursa licitației și starea vehiculului.
-            </p>
+            <div className="flex items-start gap-2 text-xs text-muted-foreground">
+              <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+              <p>
+                Rezultatul este orientativ. Costurile finale depind de sursa licitației, starea vehiculului și opțiunile de transport.
+              </p>
+            </div>
           </div>
         )}
       </CardContent>

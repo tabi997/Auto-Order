@@ -85,8 +85,8 @@ create policy "users can read own profile" on public.users
 for select using (auth.uid()::text = id::text);
 
 create policy "admin can manage users" on public.users
-for all using ((auth.jwt()->>'user_metadata') like '%"role":"admin"%')
-with check ((auth.jwt()->>'user_metadata') like '%"role":"admin"%');
+for all using ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin')
+with check ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin');
 
 -- RLS policies for sessions table
 create policy "users can manage own sessions" on public.sessions
@@ -97,8 +97,8 @@ create policy "public can read published listings" on public.listings
 for select using (status = 'PUBLISHED');
 
 create policy "admin can manage listings" on public.listings
-for all using ((auth.jwt()->>'user_metadata') like '%"role":"admin"%')
-with check ((auth.jwt()->>'user_metadata') like '%"role":"admin"%');
+for all using ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin')
+with check ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin');
 
 -- RLS policies for images table
 create policy "public can read images for published listings" on public.images
@@ -110,15 +110,15 @@ for select using (
 );
 
 create policy "admin can manage images" on public.images
-for all using ((auth.jwt()->>'user_metadata') like '%"role":"admin"%')
-with check ((auth.jwt()->>'user_metadata') like '%"role":"admin"%');
+for all using ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin')
+with check ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin');
 
 -- RLS policies for audit_log table
 create policy "admin can read audit logs" on public.audit_log
-for select using ((auth.jwt()->>'user_metadata') like '%"role":"admin"%');
+for select using ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin');
 
 create policy "admin can insert audit logs" on public.audit_log
-for insert with check ((auth.jwt()->>'user_metadata') like '%"role":"admin"%');
+for insert with check ((auth.jwt()->>'user_metadata')::jsonb->>'role' = 'admin');
 
 -- Create triggers for updated_at
 create trigger update_users_updated_at

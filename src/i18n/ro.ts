@@ -135,7 +135,7 @@ export const ro = {
     subtitle: "Licitații B2B transparente și garantate",
     process: "Procesul nostru",
     questions: "Întrebări frecvente pentru sourcing",
-    quickBrief: "Briefează-ne rapid",
+    quickBrief: "Spune-ne ce vrei",
     briefForm: {
       brand: "Marcă",
       model: "Model",
