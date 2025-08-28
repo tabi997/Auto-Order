@@ -148,9 +148,9 @@ export async function updateListingAction(id: string, data: ListingFormData) {
       data: listingData,
     })
 
-    // Handle images in a transaction
-    if (images !== undefined) {
-      await prisma.$transaction(async (tx) => {
+          // Handle images in a transaction
+      if (images !== undefined) {
+        await prisma.$transaction(async (tx: any) => {
         // Delete existing images that are not in the new list
         const existingImageIds = images.filter(img => img.id).map(img => img.id!)
         if (existingImageIds.length > 0) {

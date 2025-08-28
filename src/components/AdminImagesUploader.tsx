@@ -3,9 +3,9 @@
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { X, ImageOff, Upload } from 'lucide-react';
+import { X, ImageOff } from 'lucide-react';
 import Image from 'next/image';
-import { LocalImageUploader } from './LocalImageUploader';
+import UploadButton from './UploadButton';
 import { useToast } from '@/components/ui/use-toast';
 
 interface ImageData {
@@ -31,17 +31,17 @@ export function AdminImagesUploader({
   const { toast } = useToast();
 
   const addImages = useCallback((newImages: ImageData[]) => {
-    console.log('AdminImagesUploader - addImages called with:', newImages);
-    console.log('AdminImagesUploader - Current images:', images);
-    console.log('AdminImagesUploader - Max images:', maxImages);
+    console.log('🔍 AdminImagesUploader - addImages called with:', newImages);
+    console.log('🔍 AdminImagesUploader - Current images:', images);
+    console.log('🔍 AdminImagesUploader - Max images:', maxImages);
     
     // FIXED: For local upload, newImages contains only the newly uploaded images
     // For cloud upload, newImages contains all images to be added
     const availableSlots = maxImages - images.length;
     const imagesToAdd = newImages.slice(0, availableSlots);
     
-    console.log('AdminImagesUploader - Available slots:', availableSlots);
-    console.log('AdminImagesUploader - Images to add:', imagesToAdd);
+    console.log('🔍 AdminImagesUploader - Available slots:', availableSlots);
+    console.log('🔍 AdminImagesUploader - Images to add:', imagesToAdd);
     
     if (imagesToAdd.length === 0) {
       toast({
@@ -54,10 +54,10 @@ export function AdminImagesUploader({
 
     // FIXED: For local upload, we need to merge with existing images
     const updatedImages = [...images, ...imagesToAdd];
-    console.log('AdminImagesUploader - Updated images:', updatedImages);
+    console.log('🔍 AdminImagesUploader - Updated images:', updatedImages);
     
     setImages(updatedImages);
-    console.log('AdminImagesUploader - Calling onChange with:', updatedImages);
+    console.log('🔍 AdminImagesUploader - Calling onChange with:', updatedImages);
     onChange(updatedImages);
     
     if (imagesToAdd.length < newImages.length) {
@@ -99,11 +99,35 @@ export function AdminImagesUploader({
       {canAddMore && (
         <Card>
           <CardContent className="p-4">
-            <LocalImageUploader
-              onImagesUploaded={addImages}
-              maxFiles={maxImages - images.length}
-              maxFileSize={5}
-              listingId={listingId}
+            <UploadButton
+              folder={`auto-order/listings/${listingId || 'temp'}`}
+              onStart={() => {
+                console.log('🔍 AdminImagesUploader - Upload started');
+                toast({
+                  title: "Upload pornit",
+                  description: "Se încarcă imaginile...",
+                });
+              }}
+              onUploaded={(files) => {
+                console.log('🔍 AdminImagesUploader - Files uploaded:', files);
+                const newImages = files.map(file => ({
+                  url: file.url,
+                  alt: '',
+                }));
+                addImages(newImages);
+                toast({
+                  title: "Upload reușit",
+                  description: `${files.length} imagine(i) încărcat(e) cu succes`,
+                });
+              }}
+              onError={(err) => {
+                console.error('❌ AdminImagesUploader - Upload error:', err);
+                toast({
+                  title: "Eroare upload",
+                  description: err.message,
+                  variant: "destructive",
+                });
+              }}
             />
           </CardContent>
         </Card>

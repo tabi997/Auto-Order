@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
@@ -108,7 +109,7 @@ export function LocalImageUploader({
     } finally {
       setIsUploading(false);
     }
-  }, [maxFiles, maxFileSize, uploadedImages, onImagesUploaded]);
+  }, [maxFiles, maxFileSize, uploadedImages, onImagesUploaded, listingId]);
 
   const removeImage = useCallback((index: number) => {
     const newImages = uploadedImages.filter((_, i) => i !== index);
@@ -148,9 +149,11 @@ export function LocalImageUploader({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {uploadedImages.map((image, index) => (
             <div key={index} className="relative group">
-              <img
+              <Image
                 src={image.url}
                 alt={image.alt || `Uploaded image ${index + 1}`}
+                width={96}
+                height={96}
                 className="w-full h-24 object-cover rounded-lg"
               />
               <button

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { VehicleCard } from '@/components/VehicleCard';
 import { VehicleFilters } from '@/components/VehicleFilters';
 import { Pagination } from '@/components/Pagination';
@@ -49,7 +49,7 @@ export function StockPageContent() {
   const currentPage = parseInt(getParam('page') || '1');
 
   // Fetch vehicles data
-  const fetchVehicles = async () => {
+  const fetchVehicles = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
@@ -87,12 +87,12 @@ export function StockPageContent() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, sortField, sortOrder, getParam]);
 
   // Fetch data when component mounts or dependencies change
   useEffect(() => {
     fetchVehicles();
-  }, [currentPage, sortField, sortOrder]);
+  }, [currentPage, sortField, sortOrder, fetchVehicles]);
 
   // Handle sorting
   const handleSort = (field: SortField) => {
@@ -205,7 +205,7 @@ export function StockPageContent() {
 
           {/* Vehicles Grid */}
           {vehicles.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr items-stretch">
               {vehicles.map((vehicle) => (
                 <VehicleCard key={vehicle.id} vehicle={vehicle} />
               ))}

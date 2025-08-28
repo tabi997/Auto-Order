@@ -199,6 +199,10 @@ export function useToast() {
     duration?: number;
   }>>([]);
   
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
+  
   const addToast = useCallback((
     type: 'success' | 'error' | 'warning' | 'info',
     message: string,
@@ -216,11 +220,7 @@ export function useToast() {
     }
     
     return id;
-  }, []);
-  
-  const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  }, []);
+  }, [removeToast]);
   
   const clearToasts = useCallback(() => {
     setToasts([]);

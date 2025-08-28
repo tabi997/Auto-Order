@@ -42,18 +42,26 @@ export function ListingForm() {
   })
 
   const onSubmit = async (data: ListingFormData) => {
+    console.log('🔍 ListingForm - onSubmit STARTED with data:', data);
+    console.log('🔍 ListingForm - Form errors before submit:', form.formState.errors);
+    console.log('🔍 ListingForm - Form is valid:', form.formState.isValid);
+    
     setIsSubmitting(true)
     
     try {
+      console.log('🔍 ListingForm - Calling createListingAction...');
       const result = await createListingAction(data)
+      console.log('🔍 ListingForm - createListingAction result:', result);
       
       if (result.error) {
+        console.error('❌ ListingForm - Error from action:', result.error);
         toast({
           title: "Eroare",
           description: result.error,
           variant: "destructive",
         })
       } else {
+        console.log('✅ ListingForm - Success! Redirecting...');
         toast({
           title: "Succes",
           description: "Anunțul a fost creat cu succes!",
@@ -61,12 +69,14 @@ export function ListingForm() {
         router.push('/admin/listings')
       }
     } catch (error) {
+      console.error('💥 ListingForm - Unexpected error:', error);
       toast({
         title: "Eroare",
         description: "A apărut o eroare neașteptată",
         variant: "destructive",
       })
     } finally {
+      console.log('🔍 ListingForm - onSubmit FINISHED');
       setIsSubmitting(false)
     }
   }
@@ -77,7 +87,11 @@ export function ListingForm() {
         <CardTitle>Informații vehicul</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          console.log('🔍 ListingForm - Form submit prevented, calling handleSubmit manually');
+          form.handleSubmit(onSubmit)(e);
+        }} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Titlu */}
             <div className="space-y-2">
@@ -327,7 +341,14 @@ export function ListingForm() {
 
           {/* Butoane */}
           <div className="flex gap-4 pt-4">
-            <Button type="submit" disabled={isSubmitting}>
+            <Button 
+              type="button" 
+              disabled={isSubmitting}
+              onClick={() => {
+                console.log('🔍 ListingForm - Submit button clicked, calling handleSubmit');
+                form.handleSubmit(onSubmit)();
+              }}
+            >
               {isSubmitting ? 'Se salvează...' : 'Salvează anunțul'}
             </Button>
             <Button

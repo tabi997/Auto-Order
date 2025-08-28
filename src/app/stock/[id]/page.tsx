@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: VehicleDetailPageProps): Prom
     openGraph: {
       title: `${listing.brand} ${listing.model} ${listing.year}`,
       description: listing.shortDesc || `Vehicul ${listing.brand} ${listing.model} din ${listing.year}`,
-      images: listing.images.map(img => img.url),
+      images: listing.images.map((img: any) => img.url),
     },
   };
 }
