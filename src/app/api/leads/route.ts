@@ -18,7 +18,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         ok: false, 
-        message: error.message || 'A apărut o eroare la trimiterea solicitării' 
+        message: error.message || 'A apărut o eroare la trimiterea solicitării',
+        details: error.stack || error.toString(),
+        errorType: error.constructor.name
       }, 
       { status: 400 }
     )

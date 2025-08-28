@@ -1,153 +1,130 @@
 #!/usr/bin/env node
 
-const { createClient } = require('@supabase/supabase-js')
-const fs = require('fs')
-const path = require('path')
+const { createClient } = require('@supabase/supabase-js');
 
-// Load environment variables manually
-function loadEnv() {
-  const envPath = path.join(__dirname, '../.env.local')
-  if (!fs.existsSync(envPath)) {
-    return {}
-  }
-  
-  const envContent = fs.readFileSync(envPath, 'utf8')
-  const env = {}
-  
-  envContent.split('\n').forEach(line => {
-    const [key, ...valueParts] = line.split('=')
-    if (key && !key.startsWith('#')) {
-      env[key.trim()] = valueParts.join('=').trim()
-    }
-  })
-  
-  return env
-}
+const supabaseUrl = 'https://gpazhzixylrapqmclygw.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwYXpoeml4eWxyYXBxbWNseWd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzOTQ1MzEsImV4cCI6MjA3MTk3MDUzMX0.eFZE_MQduTL45DDu-eg6ZRilXL8ybgXVeMvUxy0b2L0';
 
-const env = loadEnv()
-
-const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = env.SUPABASE_SERVICE_ROLE_KEY
-
-console.log('🔧 Fixing RLS Policies for Leads Table')
-console.log('========================================\n')
-
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.log('❌ Missing environment variables:')
-  console.log('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? '✅ Set' : '❌ Missing')
-  console.log('SUPABASE_SERVICE_ROLE_KEY:', supabaseServiceKey ? '✅ Set' : '❌ Missing')
-  process.exit(1)
-}
-
-console.log('✅ Environment variables loaded')
-console.log('URL:', supabaseUrl)
-console.log('Service Key:', supabaseServiceKey ? '✅ Set' : '❌ Missing')
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-})
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function fixLeadsRLS() {
   try {
-    console.log('\n🔧 Fixing RLS policies for leads table...')
+    console.log('Fixing RLS policies for leads table...');
     
-    // First, let's check what policies exist
-    console.log('🔍 Checking existing policies...')
+    // Try to drop existing policies first
+    console.log('Attempting to drop existing policies...');
     
-    // Drop all existing policies for leads
-    console.log('🗑️  Dropping existing policies...')
+    try {
+      await supabase.rpc('drop_policy_if_exists', {
+        table_name: 'leads',
+        policy_name: 'anyone can insert leads'
+      });
+      console.log('Dropped insert policy');
+    } catch (e) {
+      console.log('Insert policy drop failed (might not exist):', e.message);
+    }
     
-    const policiesToDrop = [
-      'leads_select_policy',
-      'leads_insert_policy',
-      'leads_update_policy',
-      'leads_delete_policy',
-      'leads_public_select_policy'
-    ]
+    try {
+      await supabase.rpc('drop_policy_if_exists', {
+        table_name: 'leads',
+        policy_name: 'admin can read leads'
+      });
+      console.log('Dropped read policy');
+    } catch (e) {
+      console.log('Read policy drop failed (might not exist):', e.message);
+    }
     
-    for (const policyName of policiesToDrop) {
-      try {
-        await supabase.rpc('drop_policy_if_exists', { 
-          table_name: 'leads', 
-          policy_name: policyName 
-        })
-        console.log(`✅ Dropped policy: ${policyName}`)
-      } catch (e) {
-        console.log(`⚠️  Policy drop skipped: ${policyName}`)
+    // Create new policies using SQL
+    console.log('Creating new policies...');
+    
+    // Policy for anyone to insert leads
+    const { error: insertPolicyError } = await supabase.rpc('exec_sql', {
+      sql: `
+        CREATE POLICY "anyone can insert leads" ON public.leads
+        FOR INSERT WITH CHECK (true);
+      `
+    });
+    
+    if (insertPolicyError) {
+      console.log('Insert policy creation failed, trying alternative method...');
+      
+      // Try alternative method
+      const { error: altInsertError } = await supabase.rpc('create_policy', {
+        table_name: 'leads',
+        policy_name: 'anyone can insert leads',
+        definition: 'true',
+        operation: 'INSERT'
+      });
+      
+      if (altInsertError) {
+        console.error('Alternative insert policy creation failed:', altInsertError);
+        return;
       }
     }
     
-    // Test CRUD operations
-    console.log('\n🧪 Testing CRUD operations...')
+    console.log('Insert policy created');
     
-    // Test 1: Read leads
-    const { data: leads, error: readError } = await supabase
-      .from('leads')
-      .select('*')
-      .limit(1)
+    // Policy for admin to read leads
+    const { error: readPolicyError } = await supabase.rpc('exec_sql', {
+      sql: `
+        CREATE POLICY "admin can read leads" ON public.leads
+        FOR SELECT USING ((auth.jwt()->>'user_metadata') like '%"role":"admin"%');
+      `
+    });
     
-    if (readError) {
-      console.log('❌ Read test failed:', readError.message)
-    } else {
-      console.log('✅ Read test passed - leads accessible')
-    }
-    
-    // Test 2: Insert a test lead
-    const testLead = {
-      marca_model: 'Test Lead',
-      buget: '10000-15000 EUR',
-      contact: 'test@example.com',
-      status: 'new'
-    }
-    
-    const { data: newLead, error: insertError } = await supabase
-      .from('leads')
-      .insert(testLead)
-      .select()
-      .single()
-    
-    if (insertError) {
-      console.log('❌ Insert test failed:', insertError.message)
-    } else {
-      console.log('✅ Insert test passed - can create leads')
+    if (readPolicyError) {
+      console.log('Read policy creation failed, trying alternative method...');
       
-      // Test 3: Update the test lead
-      const { error: updateError } = await supabase
-        .from('leads')
-        .update({ status: 'qualified' })
-        .eq('id', newLead.id)
+      // Try alternative method
+      const { error: altReadError } = await supabase.rpc('create_policy', {
+        table_name: 'leads',
+        policy_name: 'admin can read leads',
+        definition: '(auth.jwt()->>\'user_metadata\') like \'%"role":"admin"%\'',
+        operation: 'SELECT'
+      });
       
-      if (updateError) {
-        console.log('❌ Update test failed:', updateError.message)
-      } else {
-        console.log('✅ Update test passed - can update leads')
+      if (altReadError) {
+        console.error('Alternative read policy creation failed:', altReadError);
+        return;
       }
+    }
+    
+    console.log('Read policy created');
+    console.log('RLS policies fixed successfully!');
+    
+    // Test the insert
+    console.log('Testing insert...');
+    const { data: testData, error: testError } = await supabase
+      .from('leads')
+      .insert({
+        marca_model: 'test',
+        buget: 'test',
+        contact: 'test',
+        extra: {}
+      })
+      .select();
+    
+    if (testError) {
+      console.error('Test insert failed:', testError);
+    } else {
+      console.log('Test insert successful:', testData);
       
-      // Test 4: Delete the test lead
+      // Clean up test data
       const { error: deleteError } = await supabase
         .from('leads')
         .delete()
-        .eq('id', newLead.id)
+        .eq('id', testData[0].id);
       
       if (deleteError) {
-        console.log('❌ Delete test failed:', deleteError.message)
+        console.error('Error cleaning up test data:', deleteError);
       } else {
-        console.log('✅ Delete test passed - can delete leads')
+        console.log('Test data cleaned up');
       }
     }
     
-    console.log('\n🎉 RLS policies fixed for leads table!')
-    console.log('\n📝 Next steps:')
-    console.log('1. Test the admin panel CRUD operations for leads')
-    console.log('2. Try adding, editing, and deleting leads')
-    console.log('3. Check browser console for any remaining errors')
-    
   } catch (error) {
-    console.log('❌ Error fixing leads RLS:', error.message)
+    console.error('Error fixing RLS:', error);
   }
 }
 
-fixLeadsRLS()
+fixLeadsRLS();

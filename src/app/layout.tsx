@@ -5,6 +5,7 @@ import { Header } from "@/components/Header"
 import { Footer } from "@/components/Footer"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { ToastProvider } from "@/components/ToastProvider"
+import { FloatingContactButton } from "@/components/ContactModal"
 
 import Script from "next/script"
 
@@ -115,6 +116,7 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
+              <FloatingContactButton />
             </div>
           </ToastProvider>
         </ThemeProvider>
