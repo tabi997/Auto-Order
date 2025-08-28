@@ -1,7 +1,8 @@
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
   // Protect admin routes
@@ -11,10 +12,37 @@ export function middleware(request: NextRequest) {
       return NextResponse.next()
     }
     
-    // Check for session token
-    const token = request.cookies.get('admin-session')?.value
+    // Create Supabase client
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return request.cookies.get(name)?.value
+          },
+          set(name: string, value: string, options: any) {
+            request.cookies.set({
+              name,
+              value,
+              ...options,
+            })
+          },
+          remove(name: string, options: any) {
+            request.cookies.set({
+              name,
+              value: '',
+              ...options,
+            })
+          },
+        },
+      }
+    )
     
-    if (!token) {
+    // Check if user is authenticated and is admin
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user || user.user_metadata?.role !== 'admin') {
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }

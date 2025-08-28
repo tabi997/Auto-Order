@@ -6,7 +6,7 @@ export const listingSchema = z.object({
   brand: z.string().min(2, 'Marca trebuie să aibă cel puțin 2 caractere'),
   model: z.string().min(1, 'Modelul este obligatoriu'),
   year: z.number().int().min(1990).max(new Date().getFullYear() + 1),
-  priceEur: z.number().int().min(0, 'Prețul trebuie să fie pozitiv'),
+  price_eur: z.number().int().min(0, 'Prețul trebuie să fie pozitiv'),
   km: z.number().int().min(0, 'Kilometrajul trebuie să aibă cel puțin 2 caractere'),
   fuel: z.enum(['Benzina', 'Diesel', 'Hybrid', 'Electric']),
   gearbox: z.enum(['Automata', 'Manuala']),
@@ -14,9 +14,9 @@ export const listingSchema = z.object({
   country: z.string().min(2, 'Țara trebuie să aibă cel puțin 2 caractere'),
   type: z.enum(['BUY_NOW', 'AUCTION']),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'SOLD']),
-  shortDesc: z.string().max(300, 'Descrierea nu poate depăși 300 de caractere').optional(),
-  sourceUrl: z.string().url('URL invalid').optional().or(z.literal('')),
-  sourceName: z.string().optional(),
+  short_desc: z.string().max(300, 'Descrierea nu poate depăși 300 de caractere').optional(),
+  source_url: z.string().url('URL invalid').optional().or(z.literal('')),
+  source_name: z.string().optional(),
   images: z.array(z.object({
     id: z.string().optional(),
     url: z.string().url('URL invalid'),
@@ -44,7 +44,7 @@ export interface ListingWithImages {
   brand: string
   model: string
   year: number
-  priceEur: number
+  price_eur: number
   km: number
   fuel: string
   gearbox: string
@@ -52,12 +52,12 @@ export interface ListingWithImages {
   country: string
   type: string
   status: string
-  shortDesc?: string | null
-  coverUrl?: string | null
-  sourceUrl?: string | null
-  sourceName?: string | null
-  createdAt: Date
-  updatedAt: Date
+  short_desc?: string | null
+  cover_url?: string | null
+  source_url?: string | null
+  source_name?: string | null
+  created_at: string
+  updated_at: string
   images: Array<{
     id: string
     url: string

@@ -1,45 +1,61 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useToast } from '@/components/ui/use-toast'
-import { Loader2, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useToast } from '@/components/ui/use-toast'
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/admin`,
-        },
+        password,
       })
 
       if (error) {
-        throw error
+        toast({
+          title: "Eroare de autentificare",
+          description: error.message,
+          variant: "destructive",
+        })
+        return
+      }
+
+      if (data.user?.user_metadata?.role !== 'admin') {
+        toast({
+          title: "Acces interzis",
+          description: "Nu ai permisiuni de administrator",
+          variant: "destructive",
+        })
+        await supabase.auth.signOut()
+        return
       }
 
       toast({
-        title: "Link de conectare trimis",
-        description: "Verifică emailul pentru linkul de conectare",
+        title: "Autentificare reușită",
+        description: "Bine ai venit în panoul de administrare",
       })
+
+      router.push('/admin')
     } catch (error) {
-      console.error('Login error:', error)
       toast({
         title: "Eroare",
-        description: "Nu s-a putut trimite linkul de conectare",
+        description: "A apărut o eroare neașteptată",
         variant: "destructive",
       })
     } finally {
@@ -48,58 +64,40 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            AutoOrder Admin
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Conectează-te cu emailul tău
-          </p>
-        </div>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center">Conectare Admin</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@autoorder.ro"
-                  required
-                />
-              </div>
-              
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Mail className="mr-2 h-4 w-4" />
-                )}
-                {isLoading ? 'Se trimite...' : 'Trimite link de conectare'}
-              </Button>
-            </form>
-            
-            <div className="mt-4 text-center text-sm text-gray-600">
-              <p>
-                Vei primi un link de conectare pe email. 
-                Doar utilizatorii cu rol admin pot accesa panoul.
-              </p>
+    <div className="min-h-screen flex items-center justify-center bg-muted">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-center">AutoOrder Admin</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@autoorder.ro"
+                required
+              />
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Parolă</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Se conectează...' : 'Conectare'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

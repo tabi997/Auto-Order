@@ -3,9 +3,8 @@
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { X, ImageOff } from 'lucide-react';
+import { X, ImageOff, Upload } from 'lucide-react';
 import Image from 'next/image';
-import UploadButton from './UploadButton';
 import { useToast } from '@/components/ui/use-toast';
 
 interface ImageData {
@@ -18,7 +17,7 @@ interface AdminImagesUploaderProps {
   initialImages?: ImageData[];
   onChange: (images: ImageData[]) => void;
   maxImages?: number;
-  listingId?: string; // ID-ul listing-ului pentru organizarea fișierelor
+  listingId?: string;
 }
 
 export function AdminImagesUploader({ 
@@ -28,46 +27,90 @@ export function AdminImagesUploader({
   listingId
 }: AdminImagesUploaderProps) {
   const [images, setImages] = useState<ImageData[]>(initialImages);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
-  const addImages = useCallback((newImages: ImageData[]) => {
-    console.log('🔍 AdminImagesUploader - addImages called with:', newImages);
-    console.log('🔍 AdminImagesUploader - Current images:', images);
-    console.log('🔍 AdminImagesUploader - Max images:', maxImages);
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    console.log('Starting upload for file:', file.name, 'Size:', file.size);
     
-    // FIXED: For local upload, newImages contains only the newly uploaded images
-    // For cloud upload, newImages contains all images to be added
-    const availableSlots = maxImages - images.length;
-    const imagesToAdd = newImages.slice(0, availableSlots);
-    
-    console.log('🔍 AdminImagesUploader - Available slots:', availableSlots);
-    console.log('🔍 AdminImagesUploader - Images to add:', imagesToAdd);
-    
-    if (imagesToAdd.length === 0) {
-      toast({
-        title: "Limită atinsă",
-        description: `Nu poți încărca mai mult de ${maxImages} imagini.`,
-        variant: "destructive",
-      });
-      return;
-    }
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'autoorder_unsigned');
+    formData.append('folder', `auto-order/listings/${listingId || 'temp'}`);
 
-    // FIXED: For local upload, we need to merge with existing images
-    const updatedImages = [...images, ...imagesToAdd];
-    console.log('🔍 AdminImagesUploader - Updated images:', updatedImages);
-    
-    setImages(updatedImages);
-    console.log('🔍 AdminImagesUploader - Calling onChange with:', updatedImages);
-    onChange(updatedImages);
-    
-    if (imagesToAdd.length < newImages.length) {
+    console.log('Upload preset:', 'autoorder_usigned');
+    console.log('Folder:', `auto-order/listings/${listingId || 'temp'}`);
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/dccnyvv0j/image/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Upload failed with status:', response.status);
+        console.error('Error response:', errorText);
+        throw new Error(`Upload failed: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Upload successful:', data);
+      return data.secure_url;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
+  };
+
+  const handleFileUpload = useCallback(async (files: FileList) => {
+    if (files.length === 0) return;
+
+    console.log('File upload started. Files:', files.length);
+    console.log('Available slots:', maxImages - images.length);
+
+    setIsUploading(true);
+    const availableSlots = maxImages - images.length;
+    const filesToUpload = Array.from(files).slice(0, availableSlots);
+
+    console.log('Files to upload:', filesToUpload.length);
+
+    try {
+      const uploadPromises = filesToUpload.map(uploadToCloudinary);
+      const urls = await Promise.all(uploadPromises);
+
+      console.log('Upload completed. URLs:', urls);
+
+      const newImages = urls.map(url => ({
+        url,
+        alt: '',
+      }));
+
+      const updatedImages = [...images, ...newImages];
+      setImages(updatedImages);
+      onChange(updatedImages);
+
       toast({
-        title: "Limită atinsă",
-        description: `Doar ${imagesToAdd.length} din ${newImages.length} imagini au fost adăugate.`,
+        title: "Upload reușit",
+        description: `${newImages.length} imagine(i) încărcat(e) cu succes`,
+      });
+    } catch (error) {
+      console.error('File upload error:', error);
+      toast({
+        title: "Eroare upload",
+        description: "Nu s-a putut încărca imaginea",
         variant: "destructive",
       });
+    } finally {
+      setIsUploading(false);
     }
-  }, [images, maxImages, onChange, toast]);
+  }, [images, maxImages, onChange, toast, listingId]);
 
   const removeImage = useCallback((index: number) => {
     const updatedImages = images.filter((_, i) => i !== index);
@@ -99,36 +142,30 @@ export function AdminImagesUploader({
       {canAddMore && (
         <Card>
           <CardContent className="p-4">
-            <UploadButton
-              folder={`auto-order/listings/${listingId || 'temp'}`}
-              onStart={() => {
-                console.log('🔍 AdminImagesUploader - Upload started');
-                toast({
-                  title: "Upload pornit",
-                  description: "Se încarcă imaginile...",
-                });
-              }}
-              onUploaded={(files) => {
-                console.log('🔍 AdminImagesUploader - Files uploaded:', files);
-                const newImages = files.map(file => ({
-                  url: file.url,
-                  alt: '',
-                }));
-                addImages(newImages);
-                toast({
-                  title: "Upload reușit",
-                  description: `${files.length} imagine(i) încărcat(e) cu succes`,
-                });
-              }}
-              onError={(err) => {
-                console.error('❌ AdminImagesUploader - Upload error:', err);
-                toast({
-                  title: "Eroare upload",
-                  description: err.message,
-                  variant: "destructive",
-                });
-              }}
-            />
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 transition-colors">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
+                  <p className="mb-2 text-sm text-muted-foreground">
+                    <span className="font-semibold">Click pentru a încărca</span> sau trage și plasează
+                  </p>
+                  <p className="text-xs text-muted-foreground">PNG, JPG, WEBP (max. 4MB)</p>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  multiple
+                  accept="image/*"
+                  disabled={isUploading}
+                  onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+                />
+              </label>
+            </div>
+            {isUploading && (
+              <div className="mt-2 text-center text-sm text-muted-foreground">
+                Se încarcă...
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -146,7 +183,6 @@ export function AdminImagesUploader({
                     fill
                     className="object-cover rounded-md"
                     onError={(e) => {
-                      // Fallback pentru imagini care nu se pot încărca
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
                       const parent = target.parentElement;

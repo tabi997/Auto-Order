@@ -21,7 +21,7 @@ export const LeadZ = z.object({
   marca_model: z.string().min(2),
   buget: z.string().min(1),
   contact: z.string().min(1),
-  extra: z.record(z.any()).optional().default({}),
+  extra: z.record(z.string(), z.any()).optional().default({}),
 });
 
 export type LeadInput = z.infer<typeof LeadZ>;

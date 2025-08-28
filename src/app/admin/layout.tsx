@@ -1,22 +1,16 @@
-import { Toaster } from "@/components/ui/toaster"
-import { requireAdmin } from "@/lib/auth"
-import AdminNavbar from "./AdminNavbar"
+import { AdminNavbar } from '@/components/admin/AdminNavbar'
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // Verify admin access
-  await requireAdmin()
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <AdminNavbar />
-      <main className="pt-16">
+      <main className="container mx-auto px-4 py-8">
         {children}
       </main>
-      <Toaster />
     </div>
   )
 }

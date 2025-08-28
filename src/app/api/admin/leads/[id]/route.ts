@@ -1,44 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/auth'
-import { z } from 'zod'
-
-const updateLeadSchema = z.object({
-  status: z.enum(['new', 'qualified', 'quoted', 'approved', 'ordered', 'delivered']),
-})
+import { createClient } from '@/lib/supabase/server'
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // Verify admin access
     await requireAdmin()
     
     const body = await request.json()
-    const validatedData = updateLeadSchema.parse(body)
+    const { status } = body
+    
+    if (!status) {
+      return NextResponse.json(
+        { error: 'Status is required' }, 
+        { status: 400 }
+      )
+    }
     
     const supabase = createClient()
     
-    const { data, error } = await supabase
+    const { data: lead, error } = await supabase
       .from('leads')
-      .update(validatedData)
+      .update({ status })
       .eq('id', params.id)
       .select()
       .single()
     
     if (error) {
       console.error('Database error:', error)
-      return NextResponse.json({ error: 'Database error' }, { status: 500 })
+      return NextResponse.json(
+        { error: 'Failed to update lead' }, 
+        { status: 500 }
+      )
     }
     
-    return NextResponse.json({ data })
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('redirect')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-    
+    return NextResponse.json(lead)
+  } catch (error: any) {
     console.error('API error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' }, 
+      { status: 500 }
+    )
   }
 }

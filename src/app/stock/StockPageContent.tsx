@@ -74,12 +74,29 @@ export function StockPageContent() {
       const response = await fetch(`/api/stock?${params.toString()}`);
       const data = await response.json();
       
-      if (data.ok) {
-        setVehicles(data.vehicles);
-        setPagination(data.pagination);
-        setFilterOptions(data.filters);
+      if (data.listings) {
+        setVehicles(data.listings);
+        setPagination({
+          page: data.currentPage || 1,
+          limit: 12,
+          total: data.total || 0,
+          totalPages: data.pages || 1,
+          hasNext: (data.currentPage || 1) < (data.pages || 1),
+          hasPrev: (data.currentPage || 1) > 1
+        });
+        setFilterOptions({
+          brands: [],
+          models: [],
+          bodies: [],
+          fuels: [],
+          countries: [],
+          gearboxes: [],
+          yearRange: { min: 2015, max: 2024 },
+          kmRange: { min: 0, max: 200000 },
+          priceRange: { min: 5000, max: 100000 },
+        });
       } else {
-        setError(data.message || 'A apărut o eroare la încărcarea vehiculelor');
+        setError('A apărut o eroare la încărcarea vehiculelor');
       }
     } catch (err) {
       setError('A apărut o eroare la încărcarea vehiculelor');

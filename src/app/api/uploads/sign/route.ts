@@ -1,29 +1,39 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { generateUploadSignature } from '@/lib/cloudinary';
+import { NextRequest, NextResponse } from 'next/server'
+import { v2 as cloudinary } from 'cloudinary'
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { folder = 'auto-order/dev', eager = 'q_auto,f_auto' } = body;
+    const { folder, eager } = await request.json()
     
-    const timestamp = Math.round(new Date().getTime() / 1000);
-    
-    const uploadParams = generateUploadSignature({
-      timestamp,
-      folder,
-      eager,
-    });
+    const timestamp = Math.round(new Date().getTime() / 1000)
+    const signature = cloudinary.utils.api_sign_request(
+      {
+        timestamp,
+        folder,
+        eager,
+      },
+      process.env.CLOUDINARY_API_SECRET!
+    )
 
     return NextResponse.json({
-      ok: true,
-      ...uploadParams,
+      timestamp,
+      signature,
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.CLOUDINARY_API_KEY,
       eager,
-    });
-  } catch (error) {
-    console.error('Error generating upload signature:', error);
+    })
+  } catch (error: any) {
+    console.error('Sign API error:', error)
     return NextResponse.json(
-      { ok: false, error: 'Failed to generate upload signature' },
+      { error: error.message || 'Failed to generate signature' },
       { status: 500 }
-    );
+    )
   }
 }
