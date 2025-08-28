@@ -36,15 +36,16 @@ export function VehicleCard({ vehicle, showActions = true }: VehicleCardProps) {
 
   return (
     <>
-      <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-md transition">
+      <Card className="flex h-full flex-col overflow-hidden">
         {/* Image Section */}
-        <div className="relative aspect-[4/3] w-full overflow-hidden">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-xl">
           {vehicle.image ? (
             <Image
               src={vehicle.image}
               alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
               fill
               className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               loading="lazy"
             />
           ) : (
@@ -80,7 +81,7 @@ export function VehicleCard({ vehicle, showActions = true }: VehicleCardProps) {
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-col gap-2 p-4">
+        <CardContent className="flex flex-col gap-2 p-4 pb-2">
           {/* Title */}
           <div>
             <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
@@ -107,41 +108,45 @@ export function VehicleCard({ vehicle, showActions = true }: VehicleCardProps) {
           <p className="text-sm text-muted-foreground line-clamp-2">
             {vehicle.description}
           </p>
-        </div>
+        </CardContent>
 
         {/* Footer with Actions */}
         {showActions && (
-          <div className="mt-auto p-4 pt-0">
-            <div className="flex items-center gap-2">
-              <Button asChild variant="ghost">
-                <Link href={`/stock/${vehicle.id}`}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  {t('stock.card.details')}
-                </Link>
-              </Button>
+          <CardContent className="mt-auto p-4 pt-0">
+            <div className="flex flex-col gap-2">
               <Button 
                 onClick={() => setIsLeadFormOpen(true)}
-                className="min-w-[200px] shrink-0"
+                className="w-full"
+                size="lg"
               >
                 {t('stock.card.verify')}
               </Button>
+              
+              <div className="flex items-center gap-2">
+                <Button asChild variant="ghost" size="sm" className="flex-1">
+                  <Link href={`/stock/${vehicle.id}`}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    {t('stock.card.details')}
+                  </Link>
+                </Button>
+              </div>
+              
+              {/* Source link */}
+              {vehicle.sourceUrl && (
+                <Link 
+                  href={vehicle.sourceUrl} 
+                  target="_blank" 
+                  rel="nofollow noopener noreferrer"
+                  className="inline-flex items-center text-sm text-muted-foreground hover:underline"
+                >
+                  <ExternalLink className="h-3 w-3 mr-2" />
+                  Vezi sursa licitației ({vehicle.sourceName || 'Openlane'})
+                </Link>
+              )}
             </div>
-            
-            {/* Source link */}
-            {vehicle.sourceUrl && (
-              <Link 
-                href={vehicle.sourceUrl} 
-                target="_blank" 
-                rel="nofollow noopener noreferrer"
-                className="mt-2 inline-flex items-center text-sm text-muted-foreground hover:underline"
-              >
-                <ExternalLink className="h-3 w-3 mr-2" />
-                Vezi sursa licitației ({vehicle.sourceName || 'Openlane'})
-              </Link>
-            )}
-          </div>
+          </CardContent>
         )}
-      </div>
+      </Card>
 
       {/* Lead Form Modal */}
       <LeadForm

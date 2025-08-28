@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { LocalImageUploader } from '@/components/LocalImageUploader';
 
 interface ImageData {
@@ -50,9 +51,11 @@ export default function TestUploadPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {uploadedImages.map((image, index) => (
                 <div key={index} className="border rounded-lg p-3">
-                  <img
+                  <Image
                     src={image.url}
                     alt={image.alt || `Image ${index + 1}`}
+                    width={128}
+                    height={128}
                     className="w-full h-32 object-cover rounded mb-2"
                   />
                   <div className="text-xs text-gray-600">

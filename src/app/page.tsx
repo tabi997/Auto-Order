@@ -1,18 +1,20 @@
 import { Metadata } from 'next';
-import { Hero } from '@/components/Hero';
-import { ProcessSteps } from '@/components/ProcessSteps';
+import { Hero } from '@/components/home/Hero';
+import LeadQuickForm from '@/components/home/LeadQuickForm';
+import { ProcessTimeline } from '@/components/home/ProcessTimeline';
+import { SocialProof } from '@/components/home/SocialProof';
 import { Benefits } from '@/components/home/Benefits';
-import { PriceCalc } from '@/components/PriceCalc';
-import { FAQ } from '@/components/FAQ';
-import { Testimonials } from '@/components/Testimonials';
-import { FinalCTA } from '@/components/FinalCTA';
+import { CostMiniCalculator } from '@/components/home/CostMiniCalculator';
+import FeaturedStock from '@/components/home/FeaturedStock';
+import { FAQ } from '@/components/home/FAQ';
+import { FinalCTA } from '@/components/home/FinalCTA';
 
 export const metadata: Metadata = {
-  title: 'AutoOrder – Mașini la comandă din licitații B2B',
-  description: 'Cumpărăm pentru tine din licitații B2B verificate. Transparență, raport tehnic, negociere și livrare până la ușă.',
+  title: 'AutoOrder – Mașini la comandă din licitații B2B (Openlane)',
+  description: 'Cost total final înainte de ofertă, verificare istoric, livrare rapidă. Cere ofertă în 60s și primești mașina dorită din licitații B2B.',
   openGraph: {
     title: 'AutoOrder – Mașini la comandă din licitații B2B',
-    description: 'Cumpărăm pentru tine din licitații B2B verificate. Transparență, raport tehnic, negociere și livrare până la ușă.',
+    description: 'Cost total final înainte de ofertă, verificare istoric, livrare rapidă. Cere ofertă în 60s.',
     images: ['/og/autoorder.png'],
   },
 };
@@ -23,28 +25,38 @@ export default function HomePage() {
       {/* Hero Section */}
       <Hero />
       
+      {/* Lead Quick Form Section */}
+      <LeadQuickForm />
+      
       {/* Benefits Section */}
       <Benefits />
       
-      {/* How We Work Section */}
-      <ProcessSteps />
+      {/* Process Timeline Section */}
+      <ProcessTimeline />
       
-      {/* Price Calculator Section */}
-      <section className="py-20 md:py-24 bg-muted/30">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <PriceCalc />
+      {/* Social Proof Section */}
+      <SocialProof />
+      
+      {/* Cost Calculator Section */}
+      <section className="py-20">
+        <div className="container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Calculează costul total
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Estimează costurile pentru mașina dorită
+            </p>
+          </div>
+          <CostMiniCalculator />
         </div>
       </section>
+      
+      {/* Featured Stock Section */}
+      <FeaturedStock />
       
       {/* FAQ Section */}
-      <section className="py-20 md:py-24">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <FAQ />
-        </div>
-      </section>
-      
-      {/* Testimonials Section */}
-      <Testimonials />
+      <FAQ />
       
       {/* Final CTA Section */}
       <FinalCTA />

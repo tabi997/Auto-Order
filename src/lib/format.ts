@@ -10,18 +10,18 @@ export const fmtKm = (n?: number) =>
 
 export const mapFuel = (s?: string) => {
   const fuelMap = {
-    Benzina: "Benzină",
-    Diesel: "Diesel", 
-    Hybrid: "Hybrid",
-    Electric: "Electric"
+    benzina: "Benzină",
+    diesel: "Diesel", 
+    hibrid: "Hybrid",
+    electric: "Electric"
   } as const;
   return fuelMap[s as keyof typeof fuelMap] ?? s ?? "-";
 };
 
 export const mapGear = (s?: string) => {
   const gearMap = {
-    Automata: "Automată",
-    Manuala: "Manuală"
+    automata: "Automată",
+    manuala: "Manuală"
   } as const;
   return gearMap[s as keyof typeof gearMap] ?? s ?? "-";
 };

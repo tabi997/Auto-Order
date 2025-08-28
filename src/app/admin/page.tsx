@@ -1,19 +1,13 @@
-import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { getCurrentUser } from './actions'
-import { DashboardContent } from './DashboardContent'
+import { requireAdmin } from '@/lib/auth'
+import AdminDashboard from '@/components/admin/AdminDashboard'
 
-export const metadata: Metadata = {
-  title: 'Admin Dashboard - AutoOrder',
-  description: 'Panoul de administrare AutoOrder',
-}
-
-export default async function AdminDashboardPage() {
-  const user = await getCurrentUser()
+export default async function AdminPage() {
+  const user = await requireAdmin()
   
   if (!user) {
     redirect('/admin/login')
   }
 
-  return <DashboardContent user={user} />
+  return <AdminDashboard />
 }

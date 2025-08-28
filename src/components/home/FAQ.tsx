@@ -1,121 +1,104 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { HelpCircle } from 'lucide-react';
-import { useTranslation } from '@/i18n';
 import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const faqs = [
   {
-    questionKey: 'homeFaq.question1',
-    answerKey: 'homeFaq.answer1',
-    category: 'general',
+    question: "Ce garanții oferiți pentru mașinile din licitații?",
+    answer: "Furnizăm raport tehnic detaliat, istoricul de service disponibil și, când este posibil, test OBD. Pentru vânzările B2B, garanțiile sunt limitate conform condițiilor vânzătorului, dar îți explicăm clar ce acoperă fiecare caz înainte de decizie."
   },
   {
-    questionKey: 'homeFaq.question2',
-    answerKey: 'homeFaq.answer2',
-    category: 'process',
+    question: "Care este termenul de livrare pentru o mașină?",
+    answer: "Termenul tipic este de 14-21 zile lucrătoare din momentul plății, în funcție de distanță, formalități și slotul de transport disponibil. Pentru mașini din țări mai apropiate, livrarea poate fi și mai rapidă."
   },
   {
-    questionKey: 'homeFaq.question3',
-    answerKey: 'homeFaq.answer3',
-    category: 'pricing',
+    question: "Ce taxe și costuri suplimentare sunt implicate?",
+    answer: "Costul total include: prețul vehiculului + comisionul nostru de intermediere + taxele platformei (dacă există) + transportul asigurat + costurile de înmatriculare/RAR în România. Îți oferim mereu o estimare scrisă detaliată înainte de decizie."
   },
   {
-    questionKey: 'homeFaq.question4',
-    answerKey: 'homeFaq.answer4',
-    category: 'delivery',
+    question: "Este necesar un avans pentru rezervarea mașinii?",
+    answer: "Da, după ce confirmi oferta, este necesar un avans de 10-20% din valoarea totală pentru a rezerva vehiculul. Restul sumei se plătește înainte de transport. Toate plățile se fac prin transfer bancar securizat."
   },
   {
-    questionKey: 'homeFaq.question5',
-    answerKey: 'homeFaq.answer5',
-    category: 'quality',
+    question: "Ce verificări efectuați înainte de achiziție?",
+    answer: "Verificăm istoricul complet al mașinii, raportul tehnic, fotografiile detaliate, și când este posibil, efectuăm un test OBD. Analizăm și documentele pentru a ne asigura că totul este în regulă înainte de achiziție."
   },
   {
-    questionKey: 'homeFaq.question6',
-    answerKey: 'homeFaq.answer6',
-    category: 'support',
-  },
+    question: "Cine se ocupă de actele și înmatricularea în România?",
+    answer: "Noi ne ocupăm de tot procesul: organizăm transportul asigurat, colectăm toate documentele necesare (factura, CMR, fișa tehnică) și pregătim dosarul complet pentru RAR și înmatriculare în România."
+  }
 ];
 
 export function FAQ() {
-  const { t } = useTranslation();
-  const [openItems, setOpenItems] = useState<string[]>([]);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const handleToggle = (value: string) => {
-    setOpenItems(prev => 
-      prev.includes(value) 
-        ? prev.filter(item => item !== value)
-        : [...prev, value]
-    );
+  const toggleFAQ = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
-    <section className="py-20 bg-muted/30">
-      <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+    <section className="py-20">
+      <div className="container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <Badge variant="secondary" className="mb-4">
-            {t('homeFaq.badge')}
+            Întrebări frecvente
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {t('homeFaq.title')}
+            Răspunsuri la întrebările tale
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            {t('homeFaq.subtitle')}
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Tot ce trebuie să știi despre procesul AutoOrder
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-          <Accordion 
-            type="multiple" 
-            value={openItems}
-            onValueChange={setOpenItems}
-            className="space-y-4"
-          >
-            {faqs.map((faq, index) => (
-              <AccordionItem 
-                key={index} 
-                value={`item-${index}`}
-                className="bg-background rounded-lg border shadow-sm"
-              >
-                <AccordionTrigger 
-                  className="px-6 py-4 hover:no-underline group"
-                  onClick={() => handleToggle(`item-${index}`)}
+        <div className="max-w-3xl mx-auto space-y-4">
+          {faqs.map((faq, index) => (
+            <Card key={index} className="border-0 shadow-sm">
+              <CardContent className="p-0">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-between p-6 text-left font-medium hover:bg-muted/50"
+                  onClick={() => toggleFAQ(index)}
                 >
-                  <div className="flex items-center space-x-3 text-left">
-                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <HelpCircle className="h-4 w-4 text-primary" />
-                    </div>
-                    <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {t(faq.questionKey)}
-                    </span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-6 pb-4">
-                  <div className="pl-11">
+                  <span className="pr-4">{faq.question}</span>
+                  {openIndex === index ? (
+                    <ChevronUp className="h-5 w-5 shrink-0" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 shrink-0" />
+                  )}
+                </Button>
+                {openIndex === index && (
+                  <div className="px-6 pb-6">
                     <p className="text-muted-foreground leading-relaxed">
-                      {t(faq.answerKey)}
+                      {faq.answer}
                     </p>
                   </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+                )}
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Bottom CTA */}
+        {/* CTA */}
         <div className="text-center mt-16">
-          <div className="bg-background rounded-2xl p-8 md:p-12 shadow-sm border">
-            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-              {t('homeFaq.cta.title')}
-            </h3>
-            <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              {t('homeFaq.cta.description')}
-            </p>
-            <Badge variant="default" className="text-lg px-6 py-3">
-              {t('homeFaq.cta.button')}
-            </Badge>
+          <p className="text-lg text-muted-foreground mb-6">
+            Ai alte întrebări? Suntem aici să te ajutăm.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild>
+              <a href="#lead-quick">
+                Cere ofertă personalizată
+              </a>
+            </Button>
+            <Button asChild variant="outline">
+              <a href="/contact">
+                Contactează-ne
+              </a>
+            </Button>
           </div>
         </div>
       </div>

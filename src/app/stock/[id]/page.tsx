@@ -1,47 +1,30 @@
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { VehicleDetailContent } from './VehicleDetailContent';
-import { prisma } from '@/lib/prisma';
+import { notFound } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import VehicleDetails from '@/components/stock/VehicleDetails'
 
-interface VehicleDetailPageProps {
+interface VehicleDetailsPageProps {
   params: {
-    id: string;
-  };
+    id: string
+  }
 }
 
-export async function generateMetadata({ params }: VehicleDetailPageProps): Promise<Metadata> {
-  const listing = await prisma.listing.findUnique({
-    where: { id: params.id },
-    include: { images: true }
-  });
+export default async function VehicleDetailsPage({ params }: VehicleDetailsPageProps) {
+  const supabase = createClient()
   
-  if (!listing) {
-    return {
-      title: 'Vehicul negăsit | AutoOrder',
-      description: 'Vehiculul căutat nu a fost găsit.',
-    };
+  // Fetch vehicle details
+  const { data: vehicle, error } = await supabase
+    .from('vehicles')
+    .select('*')
+    .eq('id', params.id)
+    .single()
+
+  if (error || !vehicle) {
+    notFound()
   }
 
-  return {
-    title: `${listing.brand} ${listing.model} ${listing.year} – AutoOrder`,
-    description: listing.shortDesc || `Vehicul ${listing.brand} ${listing.model} din ${listing.year}`,
-    openGraph: {
-      title: `${listing.brand} ${listing.model} ${listing.year}`,
-      description: listing.shortDesc || `Vehicul ${listing.brand} ${listing.model} din ${listing.year}`,
-      images: listing.images.map(img => img.url),
-    },
-  };
-}
-
-export default async function VehicleDetailPage({ params }: VehicleDetailPageProps) {
-  const listing = await prisma.listing.findUnique({
-    where: { id: params.id },
-    include: { images: true }
-  });
-  
-  if (!listing) {
-    notFound();
-  }
-
-  return <VehicleDetailContent listing={listing} />;
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <VehicleDetails vehicle={vehicle} />
+    </div>
+  )
 }
