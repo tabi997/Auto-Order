@@ -1,127 +1,112 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { LeadZ } from '@/schemas/vehicle'
+import { Resend } from 'resend'
 
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
+const resend = new Resend(process.env.RESEND_API_KEY)
 
-// Validation schema for lead submission
-const LeadSchema = z.object({
-  name: z.string().min(2, 'Numele trebuie să aibă cel puțin 2 caractere'),
-  phone: z.string().min(10, 'Telefonul trebuie să aibă cel puțin 10 caractere'),
-  email: z.string().email('Email invalid'),
-  requestType: z.enum(['offer', 'evaluation', 'question']),
-  message: z.string().min(10, 'Mesajul trebuie să aibă cel puțin 10 caractere'),
-  gdpr: z.boolean().refine(val => val === true, 'Trebuie să fii de acord cu GDPR'),
-  source: z.string().optional(),
-  vehicleId: z.string().optional(),
-  budget: z.number().optional(),
-});
+// Simple in-memory rate limiting (in production, use Redis/Upstash)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
 
-export async function POST(request: NextRequest) {
+function checkRateLimit(identifier: string, limit: number = 10, windowMs: number = 60000): boolean {
+  const now = Date.now()
+  const record = rateLimitMap.get(identifier)
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + windowMs })
+    return true
+  }
+  
+  if (record.count >= limit) {
+    return false
+  }
+  
+  record.count++
+  return true
+}
+
+async function sendEmail(leadData: any) {
   try {
-    const body = await request.json();
-    
-    // Validate the request body
-    const validatedData = LeadSchema.parse(body);
-    
-    // Create lead object with timestamp
-    const lead = {
-      ...validatedData,
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      ip: request.headers.get('x-forwarded-for') || request.ip || 'unknown',
-    };
-    
-    // Ensure .temp directory exists
-    const tempDir = path.join(process.cwd(), '.temp');
-    try {
-      await fs.access(tempDir);
-    } catch {
-      await fs.mkdir(tempDir, { recursive: true });
-    }
-    
-    // Read existing leads or create new file
-    const leadsFile = path.join(tempDir, 'leads.json');
-    let leads = [];
-    
-    try {
-      const existingData = await fs.readFile(leadsFile, 'utf-8');
-      leads = JSON.parse(existingData);
-    } catch {
-      // File doesn't exist or is invalid, start with empty array
-    }
-    
-    // Add new lead
-    leads.push(lead);
-    
-    // Write back to file
-    await fs.writeFile(leadsFile, JSON.stringify(leads, null, 2));
-    
-    // Log to console for demo purposes
-    console.log('New lead received:', lead);
-    
-    return NextResponse.json({ 
-      ok: true, 
-      message: 'Lead-ul a fost trimis cu succes!',
-      leadId: lead.id 
-    });
-    
+    await resend.emails.send({
+      from: 'AutoOrder <noreply@autoorder.ro>',
+      to: [leadData.contact],
+      bcc: ['admin@autoorder.ro'],
+      subject: 'Mulțumim pentru solicitarea ta - AutoOrder',
+      html: `
+        <h2>Salut!</h2>
+        <p>Mulțumim pentru interesul tău în serviciile AutoOrder.</p>
+        <p><strong>Detalii solicitare:</strong></p>
+        <ul>
+          <li>Mașină: ${leadData.marca_model}</li>
+          <li>Buget: ${leadData.buget}</li>
+        </ul>
+        <p>Echipa noastră te va contacta în următoarele 15-30 de minute pentru a discuta detalii și a-ți oferi o cotație personalizată.</p>
+        <p>Cu stimă,<br>Echipa AutoOrder</p>
+      `,
+    })
   } catch (error) {
-    console.error('Error processing lead:', error);
-    
-    if (error instanceof z.ZodError) {
-              return NextResponse.json(
-          { 
-            ok: false, 
-            message: 'Date invalide',
-            errors: error.issues 
-          },
-          { status: 400 }
-        );
-    }
-    
-    return NextResponse.json(
-      { 
-        ok: false, 
-        message: 'A apărut o eroare la procesarea cererii' 
-      },
-      { status: 500 }
-    );
+    console.error('Email sending error:', error)
   }
 }
 
-export async function GET() {
+async function sendTelegramNotification(leadData: any) {
   try {
-    const tempDir = path.join(process.cwd(), '.temp');
-    const leadsFile = path.join(tempDir, 'leads.json');
+    const message = `🚗 Lead nou: ${leadData.marca_model}, ${leadData.buget}, ${leadData.contact}`
+    const url = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`
     
-    try {
-      const data = await fs.readFile(leadsFile, 'utf-8');
-      const leads = JSON.parse(data);
-      
-      return NextResponse.json({ 
-        ok: true, 
-        leads,
-        count: leads.length 
-      });
-    } catch {
-      return NextResponse.json({ 
-        ok: true, 
-        leads: [],
-        count: 0 
-      });
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: process.env.TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'HTML'
+      })
+    })
+  } catch (error) {
+    console.error('Telegram notification error:', error)
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    // Rate limiting
+    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      )
     }
     
+    const body = await request.json()
+    const validatedData = LeadZ.parse(body)
+    
+    const supabase = createClient()
+    
+    const { data, error } = await supabase
+      .from('leads')
+      .insert(validatedData)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Database error:', error)
+      return NextResponse.json({ error: 'Database error' }, { status: 500 })
+    }
+    
+    // Send notifications (non-blocking)
+    Promise.all([
+      sendEmail(validatedData),
+      sendTelegramNotification(validatedData)
+    ]).catch(console.error)
+    
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Mulțumim! Te contactăm în 15–30 min.' 
+    })
   } catch (error) {
-    console.error('Error reading leads:', error);
-    return NextResponse.json(
-      { 
-        ok: false, 
-        message: 'A apărut o eroare la citirea lead-urilor' 
-      },
-      { status: 500 }
-    );
+    console.error('API error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

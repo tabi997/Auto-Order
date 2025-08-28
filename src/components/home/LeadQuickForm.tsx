@@ -1,253 +1,197 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
-import { ArrowRight, Car, Phone, Mail } from 'lucide-react';
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useToast } from '@/components/ui/use-toast'
+import { Loader2, CheckCircle } from 'lucide-react'
 
-interface LeadFormData {
-  vehicleModel: string;
-  budget: string;
-  contact: string;
-  contactType: 'phone' | 'email';
-  km?: string;
-  fuel?: string;
-  gearbox?: string;
-}
+const leadSchema = z.object({
+  marca_model: z.string().min(2, 'Specifică marca și modelul'),
+  buget: z.string().min(1, 'Selectează bugetul'),
+  contact: z.string().min(1, 'Introdu contactul'),
+})
 
-export function LeadQuickForm() {
-  const [formData, setFormData] = useState<LeadFormData>({
-    vehicleModel: '',
-    budget: '',
-    contact: '',
-    contactType: 'phone'
-  });
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
-  const { toast } = useToast();
+type LeadFormData = z.infer<typeof leadSchema>
 
-  const handleInputChange = (field: keyof LeadFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+const budgetOptions = [
+  { value: 'sub-5000', label: 'Sub 5.000 €' },
+  { value: '5000-10000', label: '5.000 - 10.000 €' },
+  { value: '10000-15000', label: '10.000 - 15.000 €' },
+  { value: '15000-20000', label: '15.000 - 20.000 €' },
+  { value: '20000-30000', label: '20.000 - 30.000 €' },
+  { value: 'peste-30000', label: 'Peste 30.000 €' },
+]
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+export default function LeadQuickForm() {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const { toast } = useToast()
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<LeadFormData>({
+    resolver: zodResolver(leadSchema),
+  })
 
+  const onSubmit = async (data: LeadFormData) => {
+    setIsSubmitting(true)
+    
     try {
       const response = await fetch('/api/leads', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: 'Client AutoOrder',
-          phone: formData.contactType === 'phone' ? formData.contact : '',
-          email: formData.contactType === 'email' ? formData.contact : '',
-          requestType: 'offer',
-          message: `Model dorit: ${formData.vehicleModel}, Buget: ${formData.budget}${formData.km ? `, KM: ${formData.km}` : ''}${formData.fuel ? `, Combustibil: ${formData.fuel}` : ''}${formData.gearbox ? `, Cutie: ${formData.gearbox}` : ''}`,
-          gdpr: true,
-          source: 'homepage_quick_form',
-          budget: parseInt(formData.budget.replace(/\D/g, '')) || undefined,
-        }),
-      });
+        body: JSON.stringify(data),
+      })
 
-      const result = await response.json();
-
-      if (result.ok) {
+      if (response.ok) {
+        setIsSubmitted(true)
         toast({
           title: "Mulțumim!",
           description: "Te contactăm în 15–30 min.",
-        });
-        setIsSubmitted(true);
-        setFormData({
-          vehicleModel: '',
-          budget: '',
-          contact: '',
-          contactType: 'phone'
-        });
-        setShowAdditionalFields(false);
+          duration: 5000,
+        })
+        
+        // Analytics tracking
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          (window as any).gtag('event', 'submit', {
+            event_category: 'lead_form',
+            event_label: 'homepage_quick_form',
+            data_analytics_id: 'lead_submit'
+          })
+        }
       } else {
+        const errorData = await response.json()
         toast({
           title: "Eroare",
-          description: result.message || "A apărut o eroare. Încearcă din nou.",
+          description: errorData.error || "A apărut o eroare. Încearcă din nou.",
           variant: "destructive",
-        });
+        })
       }
     } catch (error) {
+      console.error('Error submitting lead:', error)
       toast({
         title: "Eroare",
         description: "A apărut o eroare. Încearcă din nou.",
         variant: "destructive",
-      });
+      })
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   if (isSubmitted) {
     return (
-      <Card className="w-full max-w-md mx-auto">
-        <CardContent className="pt-6 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Car className="h-8 w-8 text-green-600" />
-          </div>
-          <h3 className="text-xl font-semibold mb-2">Cererea a fost trimisă!</h3>
-          <p className="text-muted-foreground mb-4">
-            Te contactăm în 15–30 minute cu oferte personalizate.
-          </p>
-          <Button 
-            onClick={() => setIsSubmitted(false)}
-            variant="outline"
-            className="w-full"
-          >
-            Trimite altă cerere
-          </Button>
-        </CardContent>
-      </Card>
-    );
+      <section id="lead-quick" className="py-16 bg-primary/5">
+        <div className="container mx-auto px-4">
+          <Card className="max-w-md mx-auto text-center">
+            <CardContent className="pt-6">
+              <CheckCircle className="mx-auto h-16 w-16 text-green-500 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Mulțumim pentru solicitarea ta!</h3>
+              <p className="text-gray-600 mb-4">
+                Echipa noastră te va contacta în următoarele 15-30 de minute pentru a discuta detalii și a-ți oferi o cotație personalizată.
+              </p>
+              <Button 
+                onClick={() => setIsSubmitted(false)}
+                variant="outline"
+              >
+                Cere altă ofertă
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    )
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto" id="lead-quick">
-      <CardHeader>
-        <CardTitle className="text-center">Primește ofertă personalizată</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Vehicle Model */}
-          <div className="space-y-2">
-            <Label htmlFor="vehicleModel">Marca/Model</Label>
-            <Input
-              id="vehicleModel"
-              placeholder="ex. VW Passat, BMW X3"
-              value={formData.vehicleModel}
-              onChange={(e) => handleInputChange('vehicleModel', e.target.value)}
-              required
-            />
-          </div>
-
-          {/* Budget */}
-          <div className="space-y-2">
-            <Label htmlFor="budget">Buget (EUR)</Label>
-            <Input
-              id="budget"
-              placeholder="ex. 15000"
-              value={formData.budget}
-              onChange={(e) => handleInputChange('budget', e.target.value)}
-              required
-            />
-          </div>
-
-          {/* Contact */}
-          <div className="space-y-2">
-            <Label htmlFor="contact">Contact</Label>
-            <div className="flex gap-2">
-              <Select
-                value={formData.contactType}
-                onValueChange={(value: 'phone' | 'email') => handleInputChange('contactType', value)}
-              >
-                <SelectTrigger className="w-24">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="phone">
-                    <Phone className="h-4 w-4" />
-                  </SelectItem>
-                  <SelectItem value="email">
-                    <Mail className="h-4 w-4" />
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <Input
-                id="contact"
-                placeholder={formData.contactType === 'phone' ? 'ex. 0722123456' : 'ex. email@example.com'}
-                value={formData.contact}
-                onChange={(e) => handleInputChange('contact', e.target.value)}
-                required
-                className="flex-1"
-              />
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={isLoading}
-          >
-            {isLoading ? 'Se trimite...' : 'Primește ofertă'}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-
-          {/* Progressive Disclosure */}
-          {!showAdditionalFields && (
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full text-sm"
-              onClick={() => setShowAdditionalFields(true)}
-            >
-              + Adaugă detalii (opțional)
-            </Button>
-          )}
-
-          {/* Additional Fields */}
-          {showAdditionalFields && (
-            <div className="space-y-4 pt-4 border-t">
-              <div className="space-y-2">
-                <Label htmlFor="km">Kilometri maximi</Label>
+    <section id="lead-quick" className="py-16 bg-primary/5">
+      <div className="container mx-auto px-4">
+        <Card className="max-w-md mx-auto">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Cere ofertă în 60s</CardTitle>
+            <p className="text-gray-600">
+              Spune-ne ce mașină vrei și îți oferim costul final
+            </p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div>
+                <Label htmlFor="marca_model">Marca și modelul dorit</Label>
                 <Input
-                  id="km"
-                  placeholder="ex. 150000"
-                  value={formData.km || ''}
-                  onChange={(e) => handleInputChange('km', e.target.value)}
+                  id="marca_model"
+                  placeholder="ex: BMW X3, Audi A4, VW Golf"
+                  {...register('marca_model')}
+                  className={errors.marca_model ? 'border-red-500' : ''}
                 />
+                {errors.marca_model && (
+                  <p className="text-red-500 text-sm mt-1">{errors.marca_model.message}</p>
+                )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="fuel">Combustibil</Label>
-                <Select
-                  value={formData.fuel || ''}
-                  onValueChange={(value) => handleInputChange('fuel', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selectează combustibilul" />
+              <div>
+                <Label htmlFor="buget">Bugetul tău</Label>
+                <Select onValueChange={(value) => setValue('buget', value)}>
+                  <SelectTrigger className={errors.buget ? 'border-red-500' : ''}>
+                    <SelectValue placeholder="Selectează bugetul" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Benzină">Benzină</SelectItem>
-                    <SelectItem value="Diesel">Diesel</SelectItem>
-                    <SelectItem value="Hibrid">Hibrid</SelectItem>
-                    <SelectItem value="Electric">Electric</SelectItem>
-                    <SelectItem value="GPL">GPL</SelectItem>
+                    {budgetOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+                {errors.buget && (
+                  <p className="text-red-500 text-sm mt-1">{errors.buget.message}</p>
+                )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="gearbox">Cutie de viteze</Label>
-                <Select
-                  value={formData.gearbox || ''}
-                  onValueChange={(value) => handleInputChange('gearbox', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selectează cutia" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Manuală">Manuală</SelectItem>
-                    <SelectItem value="Automată">Automată</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div>
+                <Label htmlFor="contact">Telefon sau email</Label>
+                <Input
+                  id="contact"
+                  placeholder="ex: 0722123456 sau email@example.com"
+                  {...register('contact')}
+                  className={errors.contact ? 'border-red-500' : ''}
+                />
+                {errors.contact && (
+                  <p className="text-red-500 text-sm mt-1">{errors.contact.message}</p>
+                )}
               </div>
-            </div>
-          )}
-        </form>
-      </CardContent>
-    </Card>
-  );
+
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isSubmitting}
+                data-analytics-id="hero_cta"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Se trimite...
+                  </>
+                ) : (
+                  'Cere ofertă în 60s'
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  )
 }

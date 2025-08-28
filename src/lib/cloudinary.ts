@@ -1,42 +1,39 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary'
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+})
 
-export { cloudinary };
-
-// Helper function to generate signed upload parameters
-export function generateUploadSignature(params: {
-  timestamp: number;
-  folder?: string;
-  eager?: string;
+export function getCloudinaryUploadSignature(params: {
+  public_id?: string
+  folder?: string
+  transformation?: string
 }) {
-  const { timestamp, folder = 'auto-order/dev', eager } = params;
+  const timestamp = Math.round(new Date().getTime() / 1000)
   
-  const signatureParams: any = {
-    timestamp,
-    folder,
-  };
-
-  // Add eager to signature if provided
-  if (eager) {
-    signatureParams.eager = eager;
-  }
-
   const signature = cloudinary.utils.api_sign_request(
-    signatureParams,
+    {
+      timestamp,
+      ...params,
+    },
     process.env.CLOUDINARY_API_SECRET!
-  );
-
+  )
+  
   return {
-    timestamp,
-    folder,
     signature,
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-    apiKey: process.env.CLOUDINARY_API_KEY,
-  };
+    timestamp,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  }
+}
+
+export function getUnsignedUploadUrl() {
+  return `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`
+}
+
+export function getUploadPreset() {
+  return process.env.CLOUDINARY_UPLOAD_PRESET || 'autoorder_unsigned'
 }

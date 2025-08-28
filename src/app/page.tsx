@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import { Hero } from '@/components/home/Hero';
-import { LeadQuickForm } from '@/components/home/LeadQuickForm';
+import LeadQuickForm from '@/components/home/LeadQuickForm';
 import { ProcessTimeline } from '@/components/home/ProcessTimeline';
 import { SocialProof } from '@/components/home/SocialProof';
 import { Benefits } from '@/components/home/Benefits';
 import { CostMiniCalculator } from '@/components/home/CostMiniCalculator';
-import { FeaturedStock } from '@/components/home/FeaturedStock';
+import FeaturedStock from '@/components/home/FeaturedStock';
 import { FAQ } from '@/components/home/FAQ';
 import { FinalCTA } from '@/components/home/FinalCTA';
 
@@ -26,19 +26,7 @@ export default function HomePage() {
       <Hero />
       
       {/* Lead Quick Form Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Primește ofertă personalizată
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Completează formularul și te contactăm în 15-30 minute cu oferte potrivite
-            </p>
-          </div>
-          <LeadQuickForm />
-        </div>
-      </section>
+      <LeadQuickForm />
       
       {/* Benefits Section */}
       <Benefits />

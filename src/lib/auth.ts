@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { prisma } from './prisma'
+import { createClient } from './supabase/server'
+import { redirect } from 'next/navigation'
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12)
@@ -78,5 +80,34 @@ export async function authenticateUser(email: string, password: string) {
   const isValid = await verifyPassword(password, user.password)
   if (!isValid) return null
 
+  return user
+}
+
+export async function requireAdmin() {
+  const supabase = createClient()
+  
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error || !user) {
+    redirect('/admin/login')
+  }
+  
+  const userMetadata = user.user_metadata
+  if (userMetadata?.role !== 'admin') {
+    redirect('/admin/login')
+  }
+  
+  return user
+}
+
+export async function getCurrentUser() {
+  const supabase = createClient()
+  
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error || !user) {
+    return null
+  }
+  
   return user
 }

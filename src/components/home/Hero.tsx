@@ -17,17 +17,22 @@ export function Hero() {
         <div className="text-center max-w-4xl mx-auto">
           {/* Main heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-            Mașina ta, adusă la comandă din licitații B2B (Openlane)
+            Aduci mașina dorită din Openlane, cu cost final și comision AutoOrder
           </h1>
           
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed">
-            Cost total final înainte de ofertă, verificare istoric, livrare rapidă, totul pentru un comision AutoOrder.
+            Cost transparent, verificare istoric, livrare rapidă în România.
           </p>
           
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Button asChild size="lg" className="text-lg px-8 py-6">
+            <Button 
+              asChild 
+              size="lg" 
+              className="text-lg px-8 py-6"
+              data-analytics-id="hero_cta"
+            >
               <Link href="#lead-quick" aria-label="Cere ofertă în 60s">
                 Cere ofertă în 60s
                 <ArrowRight className="ml-2 h-5 w-5" />

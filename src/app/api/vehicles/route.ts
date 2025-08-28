@@ -1,126 +1,43 @@
-import { NextRequest, NextResponse } from 'next/server';
-import vehiclesData from '@/data/vehicles.json';
-
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const vehicles = vehiclesData.vehicles;
+    const { searchParams } = new URL(request.url)
+    const featured = searchParams.get('featured')
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '12')
+    const sortBy = searchParams.get('sortBy') || 'created_at'
+    const sortOrder = searchParams.get('sortOrder') || 'desc'
     
-    // Get filter parameters
-    const brand = searchParams.get('brand');
-    const model = searchParams.get('model');
-    const body = searchParams.get('body');
-    const fuel = searchParams.get('fuel');
-    const yearMin = searchParams.get('yearMin');
-    const yearMax = searchParams.get('yearMax');
-    const kmMax = searchParams.get('kmMax');
-    const priceMin = searchParams.get('priceMin');
-    const priceMax = searchParams.get('priceMax');
-    const country = searchParams.get('country');
-    const gearbox = searchParams.get('gearbox');
-    const sortBy = searchParams.get('sortBy') || 'priceEur';
-    const sortOrder = searchParams.get('sortOrder') || 'asc';
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '12');
+    const supabase = createClient()
     
-    // Apply filters
-    let filteredVehicles = vehicles.filter(vehicle => {
-      if (brand && brand !== 'all' && vehicle.brand.toLowerCase() !== brand.toLowerCase()) return false;
-      if (model && !vehicle.model.toLowerCase().includes(model.toLowerCase())) return false;
-      if (body && body !== 'all' && vehicle.body !== body) return false;
-      if (fuel && fuel !== 'all' && vehicle.fuel !== fuel) return false;
-      if (yearMin && vehicle.year < parseInt(yearMin)) return false;
-      if (yearMax && vehicle.year > parseInt(yearMax)) return false;
-      if (kmMax && vehicle.km > parseInt(kmMax)) return false;
-      if (priceMin && vehicle.priceEur < parseInt(priceMin)) return false;
-      if (priceMax && vehicle.priceEur > parseInt(priceMax)) return false;
-      if (country && country !== 'all' && vehicle.country !== country) return false;
-      if (gearbox && gearbox !== 'all' && vehicle.gearbox !== gearbox) return false;
-      
-      return true;
-    });
+    let query = supabase
+      .from('vehicles')
+      .select('id,make,model,year,km,fuel,transmission,price_est,badges,images,source,featured,featured_position')
     
-    // Apply sorting
-    filteredVehicles.sort((a, b) => {
-      let aValue, bValue;
-      
-      switch (sortBy) {
-        case 'price':
-        case 'priceEur':
-          aValue = a.priceEur;
-          bValue = b.priceEur;
-          break;
-        case 'year':
-          aValue = a.year;
-          bValue = b.year;
-          break;
-        case 'km':
-          aValue = a.km;
-          bValue = b.km;
-          break;
-        default:
-          aValue = a.priceEur;
-          bValue = b.priceEur;
-      }
-      
-      if (sortOrder === 'asc') {
-        return aValue - bValue;
-      } else {
-        return bValue - aValue;
-      }
-    });
+    if (featured === 'true') {
+      query = query.eq('featured', true)
+        .order('featured_position', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(6)
+    } else {
+      const offset = (page - 1) * limit
+      query = query
+        .order(sortBy, { ascending: sortOrder === 'asc' })
+        .range(offset, offset + limit - 1)
+    }
     
-    // Calculate pagination
-    const total = filteredVehicles.length;
-    const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedVehicles = filteredVehicles.slice(startIndex, endIndex);
+    const { data, error } = await query
     
-    // Transform vehicles to match expected format
-    const transformedVehicles = paginatedVehicles.map(vehicle => ({
-      id: vehicle.id,
-      brand: vehicle.brand,
-      model: vehicle.model,
-      year: vehicle.year,
-      km: vehicle.km,
-      price: vehicle.priceEur,
-      body: vehicle.body,
-      fuel: vehicle.fuel,
-      gearbox: vehicle.gearbox,
-      country: vehicle.country,
-      image: vehicle.images?.[0] || '/api/placeholder/400/300',
-      type: (vehicle as any).type || 'BUY_NOW',
-      description: vehicle.shortDesc || vehicle.description,
-      sourceUrl: vehicle.sourceUrl,
-      sourceName: vehicle.sourceName,
-    }));
+    if (error) {
+      console.error('Database error:', error)
+      return NextResponse.json({ error: 'Database error' }, { status: 500 })
+    }
     
-    return NextResponse.json({
-      ok: true,
-      vehicles: transformedVehicles,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNext: page < totalPages,
-        hasPrev: page > 1,
-      },
-      filters: vehiclesData.filters,
-    });
-    
+    return NextResponse.json({ data })
   } catch (error) {
-    console.error('Error fetching vehicles:', error);
-    return NextResponse.json(
-      { 
-        ok: false, 
-        message: 'A apărut o eroare la încărcarea vehiculelor' 
-      },
-      { status: 500 }
-    );
+    console.error('API error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
