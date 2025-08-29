@@ -71,8 +71,8 @@ export function Testimonials() {
               <CardHeader className="pb-4 flex-shrink-0">
                 <div className="flex items-start justify-between mb-4">
                   <Avatar className="h-12 w-12">
-                    {testimonial.avatar ? (
-                      <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
+                    {testimonial.avatar_url ? (
+                      <AvatarImage src={testimonial.avatar_url} alt={testimonial.name} />
                     ) : (
                       <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                         {testimonial.name.split(' ').map(n => n[0]).join('')}
@@ -88,9 +88,11 @@ export function Testimonials() {
                   ))}
                 </div>
                 
-                <Badge variant="outline" className="text-xs">
-                  {testimonial.badge}
-                </Badge>
+                {testimonial.is_featured && (
+                  <Badge variant="outline" className="text-xs">
+                    Featured
+                  </Badge>
+                )}
               </CardHeader>
               
               <CardContent className="flex-1 flex flex-col">

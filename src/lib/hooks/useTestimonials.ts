@@ -4,12 +4,14 @@ import { getTestimonials } from '@/app/actions/testimonials';
 export interface Testimonial {
   id: string;
   name: string;
-  role: string;
+  role?: string;
   company?: string;
   rating: number;
   content: string;
-  avatar?: string;
-  badge: string;
+  avatar_url?: string;
+  is_featured: boolean;
+  order_index: number;
+  badge?: string;
   active: boolean;
   created_at: string;
   updated_at: string;

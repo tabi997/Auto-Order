@@ -17,6 +17,14 @@ import {
 
 const settingsSections = [
   {
+    title: 'Setări Site',
+    description: 'Hero, Header, SEO, Contact, Newsletter',
+    href: '/admin/settings/site',
+    icon: Globe,
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50'
+  },
+  {
     title: 'Testimoniale',
     description: 'Gestionează testimoniale și recenzii clienți',
     href: '/admin/settings/testimonials',
@@ -25,44 +33,12 @@ const settingsSections = [
     bgColor: 'bg-yellow-50'
   },
   {
-    title: 'Informații Contact',
-    description: 'Modifică email, telefon, adresă și program',
-    href: '/admin/settings/contact',
-    icon: Contact,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50'
-  },
-  {
-    title: 'Conținut Pagini',
-    description: 'Editează textul din diferitele pagini',
-    href: '/admin/settings/content',
-    icon: FileText,
-    color: 'text-green-600',
-    bgColor: 'bg-green-50'
-  },
-  {
-    title: 'Setări Site',
-    description: 'Configurări generale site și SEO',
-    href: '/admin/settings/site',
-    icon: Globe,
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50'
-  },
-  {
-    title: 'Imagini și Media',
-    description: 'Gestionează imagini și fișiere media',
+    title: 'Media',
+    description: 'Upload imagini pentru Hero și SEO',
     href: '/admin/settings/media',
     icon: Image,
     color: 'text-orange-600',
     bgColor: 'bg-orange-50'
-  },
-  {
-    title: 'Newsletter',
-    description: 'Configurări newsletter și comunicări',
-    href: '/admin/settings/newsletter',
-    icon: Mail,
-    color: 'text-red-600',
-    bgColor: 'bg-red-50'
   }
 ]
 

@@ -8,22 +8,48 @@ import { CostMiniCalculator } from '@/components/home/CostMiniCalculator';
 import FeaturedStock from '@/components/home/FeaturedStock';
 import { FAQ } from '@/components/home/FAQ';
 import { FinalCTA } from '@/components/home/FinalCTA';
+import { getSiteSettings } from '@/app/admin/settings/actions';
 
-export const metadata: Metadata = {
-  title: 'AutoOrder – Mașina visurilor tale din licitații B2B (Openlane)',
-  description: 'Preț final garantat, istoric verificat, livrare în România în 14-21 zile. Cere ofertă personalizată în 60s și primești mașina dorită din licitații B2B cu 15-30% mai ieftin.',
-  openGraph: {
-    title: 'AutoOrder – Mașina visurilor tale din licitații B2B',
-    description: 'Preț final garantat, istoric verificat, livrare în România în 14-21 zile. Cere ofertă personalizată în 60s.',
-    images: ['/og/autoorder.png'],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const settings = await getSiteSettings();
+    
+    return {
+      title: settings.seo.title,
+      description: settings.seo.description,
+      openGraph: {
+        title: settings.seo.title,
+        description: settings.seo.description,
+        images: settings.seo.ogImage ? [settings.seo.ogImage] : ['/og/autoorder.png'],
+      },
+    };
+  } catch (error) {
+    // Fallback to default metadata
+    return {
+      title: 'AutoOrder – Mașina visurilor tale din licitații B2B (Openlane)',
+      description: 'Preț final garantat, istoric verificat, livrare în România în 14-21 zile. Cere ofertă personalizată în 60s și primești mașina dorită din licitații B2B cu 15-30% mai ieftin.',
+      openGraph: {
+        title: 'AutoOrder – Mașina visurilor tale din licitații B2B',
+        description: 'Preț final garantat, istoric verificat, livrare în România în 14-21 zile. Cere ofertă personalizată în 60s.',
+        images: ['/og/autoorder.png'],
+      },
+    };
+  }
+}
 
-export default function HomePage() {
+export default async function HomePage() {
+  const settings = await getSiteSettings();
+
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <Hero />
+      <Hero 
+        title={settings.hero.title}
+        subtitle={settings.hero.subtitle}
+        ctaLabel={settings.hero.ctaLabel}
+        ctaHref={settings.hero.ctaHref}
+        heroImage={settings.hero.heroImage}
+      />
       
       {/* Lead Quick Form Section */}
       <LeadQuickForm />
