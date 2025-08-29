@@ -341,7 +341,8 @@ export function SourcingContent() {
                   <Checkbox
                     id="gdpr-sourcing"
                     checked={formData.gdpr}
-                    onCheckedChange={(checked) => handleInputChange('gdpr', checked as boolean)}
+                    onCheckedChange={(checked: boolean | 'indeterminate') => handleInputChange('gdpr', checked as boolean)}
+                    className="mt-1"
                   />
                   <label
                     htmlFor="gdpr-sourcing"

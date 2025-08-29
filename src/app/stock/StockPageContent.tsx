@@ -6,7 +6,7 @@ import { VehicleFilters } from '@/components/VehicleFilters';
 import { Pagination } from '@/components/Pagination';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUpDown, SortAsc, SortDesc, Car } from 'lucide-react';
+import { ArrowUpDown, SortAsc, SortDesc, Car, Filter } from 'lucide-react';
 import { useTranslation } from '@/i18n';
 import { useQueryParams } from '@/lib/hooks';
 import { StockSchema } from '@/components/StockSchema';
@@ -150,10 +150,13 @@ export function StockPageContent() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">Se încarcă vehiculele...</p>
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center space-y-6">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-medium text-slate-900">Se încarcă vehiculele...</h3>
+            <p className="text-slate-600">Căutăm în baza noastră de licitații B2B</p>
+          </div>
         </div>
       </div>
     );
@@ -161,16 +164,23 @@ export function StockPageContent() {
 
   if (error) {
     return (
-      <div className="text-center py-16">
-        <div className="max-w-md mx-auto space-y-4">
-          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto">
-            <Car className="h-8 w-8 text-destructive" />
+      <div className="text-center py-20">
+        <div className="max-w-md mx-auto space-y-6">
+          <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto border border-red-100">
+            <Car className="h-10 w-10 text-red-500" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">
-            A apărut o eroare
-          </h3>
-          <p className="text-muted-foreground">{error}</p>
-          <Button onClick={fetchVehicles} variant="outline">
+          <div className="space-y-2">
+            <h3 className="text-2xl font-medium text-slate-900">
+              A apărut o eroare
+            </h3>
+            <p className="text-slate-600">{error}</p>
+          </div>
+          <Button 
+            onClick={fetchVehicles} 
+            variant="outline"
+            size="lg"
+            className="px-8 py-3"
+          >
             Încearcă din nou
           </Button>
         </div>
@@ -186,78 +196,90 @@ export function StockPageContent() {
         totalPages={pagination.totalPages} 
       />
       
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
         {/* Filters Sidebar */}
         <div className="lg:col-span-1">
-          <VehicleFilters filterOptions={filterOptions} />
+          <div className="sticky top-8">
+            <div className="flex items-center gap-2 mb-6">
+              <Filter className="h-5 w-5 text-slate-600" />
+              <h3 className="text-lg font-medium text-slate-900">Filtre</h3>
+            </div>
+            <VehicleFilters filterOptions={filterOptions} />
+          </div>
         </div>
 
         {/* Main Content */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="lg:col-span-3 space-y-8">
           {/* Results Summary and Sort */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-            <div className="flex items-center space-x-2">
-              <span className="text-lg font-medium text-foreground">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 bg-slate-50 rounded-2xl p-6 border border-slate-100">
+            <div className="flex items-center space-x-3">
+              <span className="text-xl font-medium text-slate-900">
                 {t('stock.page.results', { count: pagination.total })}
               </span>
               {pagination.total !== vehicles.length && (
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="px-3 py-1">
                   {t('stock.page.activeFilters')}
                 </Badge>
               )}
             </div>
 
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-muted-foreground">{t('stock.sort.label')}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSort('price')}
-                className="flex items-center space-x-1"
-              >
-                {t('stock.sort.price')} {getSortIcon('price')}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSort('year')}
-                className="flex items-center space-x-1"
-              >
-                {t('stock.sort.year')} {getSortIcon('year')}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSort('km')}
-                className="flex items-center space-x-1"
-              >
-                {t('stock.sort.km')} {getSortIcon('km')}
-              </Button>
+            <div className="flex items-center space-x-3">
+              <span className="text-sm text-slate-600 font-medium">{t('stock.sort.label')}</span>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSort('price')}
+                  className="flex items-center space-x-2 px-4 py-2 h-auto border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                >
+                  {t('stock.sort.price')} {getSortIcon('price')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSort('year')}
+                  className="flex items-center space-x-2 px-4 py-2 h-auto border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                >
+                  {t('stock.sort.year')} {getSortIcon('year')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSort('km')}
+                  className="flex items-center space-x-2 px-4 py-2 h-auto border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                >
+                  {t('stock.sort.km')} {getSortIcon('km')}
+                </Button>
+              </div>
             </div>
           </div>
 
           {/* Vehicles Grid */}
           {vehicles.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-fr items-stretch">
               {vehicles.map((vehicle) => (
                 <VehicleCard key={vehicle.id} vehicle={vehicle} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
-              <div className="max-w-md mx-auto space-y-4">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
-                  <Car className="h-8 w-8 text-muted-foreground" />
+            <div className="text-center py-20">
+              <div className="max-w-md mx-auto space-y-6">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto border border-slate-200">
+                  <Car className="h-10 w-10 text-slate-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {t('stock.empty.title')}
-                </h3>
-                <p className="text-muted-foreground">
-                  {t('stock.empty.subtitle')}
-                </p>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-medium text-slate-900">
+                    {t('stock.empty.title')}
+                  </h3>
+                  <p className="text-slate-600 text-lg">
+                    {t('stock.empty.subtitle')}
+                  </p>
+                </div>
                 <Button 
                   variant="outline"
+                  size="lg"
                   onClick={() => window.location.href = '/sourcing'}
+                  className="px-8 py-3"
                 >
                   {t('stock.empty.cta')}
                 </Button>
@@ -266,20 +288,22 @@ export function StockPageContent() {
           )}
 
           {/* Disclaimer */}
-          <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground italic">
+          <div className="text-center py-8 bg-slate-50 rounded-2xl border border-slate-100">
+            <p className="text-sm text-slate-600 italic max-w-2xl mx-auto">
               {t('stock.disclaimer')}
             </p>
           </div>
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <Pagination
-              currentPage={pagination.page}
-              totalPages={pagination.totalPages}
-              onPageChange={handlePageChange}
-              className="mt-8"
-            />
+            <div className="mt-12">
+              <Pagination
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                onPageChange={handlePageChange}
+                className="mt-8"
+              />
+            </div>
           )}
         </div>
       </div>

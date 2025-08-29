@@ -324,3 +324,41 @@ export async function deleteAdminVehicle(id: string) {
     throw new Error(error.message || 'Failed to delete vehicle')
   }
 }
+
+export interface PageContent {
+  id: string
+  page_id: string
+  section_key: string
+  title: string
+  content: string
+  subtitle?: string
+  language: string
+  created_at: string
+  updated_at: string
+}
+
+export async function getPageContent(pageId: string, language: string = 'ro'): Promise<PageContent[]> {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+
+    const { data, error } = await supabase
+      .from('page_content')
+      .select('*')
+      .eq('page_id', pageId)
+      .eq('language', language)
+      .order('section_key')
+
+    if (error) {
+      console.error('Error fetching page content:', error)
+      throw new Error('Failed to fetch page content')
+    }
+
+    return data || []
+  } catch (error: any) {
+    console.error('Get page content error:', error)
+    throw new Error(error.message || 'Failed to fetch page content')
+  }
+}

@@ -51,19 +51,61 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)", 
         sm: "calc(var(--radius) - 4px)" 
       },
+      boxShadow: {
+        '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        '3xl': '0 35px 60px -12px rgba(0, 0, 0, 0.25)',
+        'inner-lg': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+        'primary': '0 10px 25px -3px rgba(var(--primary), 0.3)',
+        'primary-lg': '0 20px 40px -3px rgba(var(--primary), 0.3)',
+      },
+      animation: {
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'bounce-slow': 'bounce 2s infinite',
+      },
       keyframes: {
-        "accordion-down": { 
+        'accordion-down': { 
           from: { height: "0" }, 
           to: { height: "var(--radix-accordion-content-height)" } 
         },
-        "accordion-up": { 
+        'accordion-up': { 
           from: { height: "var(--radix-accordion-content-height)" }, 
           to: { height: "0" } 
         },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
       },
-      animation: { 
-        "accordion-down": "accordion-down 0.2s ease-out", 
-        "accordion-up": "accordion-up 0.2s ease-out" 
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
+      },
+      fontSize: {
+        '2xs': ['0.625rem', { lineHeight: '0.75rem' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+        '5xl': ['3rem', { lineHeight: '1' }],
+        '6xl': ['3.75rem', { lineHeight: '1' }],
+        '7xl': ['4.5rem', { lineHeight: '1' }],
+        '8xl': ['6rem', { lineHeight: '1' }],
+        '9xl': ['8rem', { lineHeight: '1' }],
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
+      transitionDuration: {
+        '400': '400ms',
+        '600': '600ms',
+        '700': '700ms',
+        '800': '800ms',
+      },
+      transitionTimingFunction: {
+        'bounce-in': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
     },
   },

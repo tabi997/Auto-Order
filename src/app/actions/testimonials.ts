@@ -6,9 +6,13 @@ import { requireAdmin } from '@/lib/auth'
 export interface Testimonial {
   id?: string
   name: string
+  role?: string
+  avatar_url?: string
   content: string
   rating: number
-  vehicle?: string
+  is_featured: boolean
+  order_index: number
+  badge?: string
   active: boolean
   created_at?: string
   updated_at?: string
@@ -67,9 +71,12 @@ export async function createTestimonial(testimonial: Omit<Testimonial, 'id' | 'c
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
+    // Add badge value based on is_featured status
+    const badgeValue = testimonial.is_featured ? 'Featured' : 'Standard';
+
     const { data, error } = await supabase
       .from('testimonials')
-      .insert([testimonial])
+      .insert([{ ...testimonial, badge: badgeValue }])
       .select()
       .single()
 
@@ -94,9 +101,15 @@ export async function updateTestimonial(id: string, updates: Partial<Testimonial
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
+    // Add badge value based on is_featured status if it's being updated
+    let updateData = { ...updates };
+    if (updates.is_featured !== undefined) {
+      updateData.badge = updates.is_featured ? 'Featured' : 'Standard';
+    }
+
     const { data, error } = await supabase
       .from('testimonials')
-      .update(updates)
+      .update(updateData)
       .eq('id', id)
       .select()
       .single()
