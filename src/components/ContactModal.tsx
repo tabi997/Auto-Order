@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ContactForm } from '@/app/contact/ContactForm';
-import { MessageSquare, X } from 'lucide-react';
+import { FaComments, FaTimes, FaArrowDown } from 'react-icons/fa';
+import { useScrollVisibility } from '@/hooks/useScrollVisibility';
 
 interface ContactModalProps {
   trigger?: React.ReactNode;
@@ -35,7 +36,7 @@ export function ContactModal({
 
   const defaultTrigger = (
     <Button variant="default" size="sm" className="gap-2">
-      <MessageSquare className="h-4 w-4" />
+      <FaComments className="h-4 w-4" />
       Contact
     </Button>
   );
@@ -59,7 +60,7 @@ export function ContactModal({
             className="absolute right-4 top-4 h-8 w-8 p-0"
             onClick={handleClose}
           >
-            <X className="h-4 w-4" />
+            <FaTimes className="h-4 w-4" />
           </Button>
         </DialogHeader>
         
@@ -77,16 +78,131 @@ export function ContactModal({
 // Floating Contact Button Component
 export function FloatingContactButton() {
   const [open, setOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const isVisible = useScrollVisibility(100);
+
+  // Debounced hover state to prevent excessive re-renders
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+  }, []);
+
+  // Handle mobile touch events
+  const handleTouchStart = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    // Delay hiding to allow for touch interactions
+    setTimeout(() => setIsHovered(false), 1000);
+  }, []);
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setOpen(true);
+    }
+  }, []);
 
   return (
     <>
-      <Button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50 bg-primary hover:bg-primary/90"
-        size="lg"
+      <div
+        className={`fixed z-50 transition-all duration-300 ease-in-out ${
+          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+        } ${
+          // Responsive positioning with orientation support
+          'bottom-4 right-4 sm:bottom-6 sm:right-6'
+        } ${
+          // Handle landscape orientation on mobile
+          'landscape:bottom-2 landscape:right-2 sm:landscape:bottom-6 sm:landscape:right-6'
+        }`}
+        role="complementary"
+        aria-label="Contact rapid"
       >
-        <MessageSquare className="h-6 w-6" />
-      </Button>
+        <Button
+          onClick={() => setOpen(true)}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onKeyDown={handleKeyDown}
+          variant="outline"
+          className="relative rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-primary-foreground border-0 group focus:ring-4 focus:ring-primary/20 focus:outline-none ${
+            // Responsive sizing
+            'h-14 w-14 sm:h-16 sm:w-16'
+          } ${
+            // Reduced motion support
+            'motion-reduce:transition-none'
+          }"
+          size="lg"
+          aria-label="Deschide formularul de contact"
+          title="Contact rapid"
+        >
+          <div className="relative">
+            <FaComments 
+              className={`transition-transform duration-300 ${
+                isHovered ? 'scale-110' : 'scale-100'
+              } ${
+                // Responsive icon sizing
+                'h-5 w-5 sm:h-6 sm:w-6'
+              } ${
+                // Reduced motion support
+                'motion-reduce:transition-transform-none'
+              }`} 
+              aria-hidden="true"
+            />
+            {/* Enhanced notification indicator with subtle animation */}
+            <div 
+              className="absolute -top-1 -right-1 bg-destructive rounded-full ${
+                // Responsive indicator sizing
+                'h-2.5 w-2.5 sm:h-3 sm:w-3'
+              } ${
+                // Subtle animation that's less distracting
+                'animate-ping motion-reduce:animate-none'
+              }"
+              aria-label="Contact rapid disponibil"
+              role="status"
+            />
+            {/* Static indicator for better visibility */}
+            <div 
+              className="absolute -top-1 -right-1 bg-destructive rounded-full ${
+                // Responsive indicator sizing
+                'h-2.5 w-2.5 sm:h-3 sm:w-3'
+              }"
+              aria-hidden="true"
+            />
+          </div>
+          
+          {/* Enhanced tooltip with better positioning and accessibility */}
+          <div 
+            className="absolute opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none z-10 ${
+              // Responsive tooltip positioning
+              'right-full mr-2 sm:mr-3 top-1/2 transform -translate-y-1/2'
+            } ${
+              // Hide tooltip on mobile to prevent layout issues
+              'hidden sm:block'
+            }"
+            role="tooltip"
+            aria-hidden="true"
+          >
+            <div className="bg-popover text-popover-foreground text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg whitespace-nowrap shadow-lg border border-border">
+              Contact rapid
+              <div className="absolute left-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-l-4 border-l-popover border-t-4 border-t-transparent border-b-4 border-b-transparent" />
+            </div>
+          </div>
+        </Button>
+
+        {/* Mobile-friendly alternative text */}
+        <div className="block sm:hidden mt-2 text-center">
+          <span className="text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded-md">
+            Contact
+          </span>
+        </div>
+      </div>
 
       <ContactModal
         open={open}
