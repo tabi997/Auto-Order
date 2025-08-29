@@ -1,94 +1,85 @@
-import { Metadata } from 'next';
 import { Hero } from '@/components/home/Hero';
 import { TrustIndicators } from '@/components/home/TrustIndicators';
 import { HowItWorks } from '@/components/home/HowItWorks';
 import { SuccessStories } from '@/components/home/SuccessStories';
 import { Testimonials } from '@/components/Testimonials';
-import { Benefits } from '@/components/home/Benefits';
 import { CostMiniCalculator } from '@/components/home/CostMiniCalculator';
 import FeaturedStock from '@/components/home/FeaturedStock';
 import { FAQ } from '@/components/home/FAQ';
 import { FinalCTA } from '@/components/home/FinalCTA';
-import { getSiteSettings } from '@/app/admin/settings/actions';
 
-export async function generateMetadata(): Promise<Metadata> {
-  try {
-    const settings = await getSiteSettings();
-    
-    return {
-      title: settings.seo.title,
-      description: settings.seo.description,
-      openGraph: {
-        title: settings.seo.title,
-        description: settings.seo.description,
-        images: settings.seo.ogImage ? [settings.seo.ogImage] : ['/og/autoorder.png'],
-      },
-    };
-  } catch (error) {
-    // Fallback to default metadata
-    return {
-      title: 'AutoOrder – Mașina visurilor tale din licitații B2B (Openlane)',
-      description: 'Preț final garantat, istoric verificat, livrare în România în 14-21 zile. Cere ofertă personalizată în 60s și primești mașina dorită din licitații B2B cu 15-30% mai ieftin.',
-      openGraph: {
-        title: 'AutoOrder – Mașina visurilor tale din licitații B2B',
-        description: 'Preț final garantat, istoric verificat, livrare în România în 14-21 zile. Cere ofertă personalizată în 60s.',
-        images: ['/og/autoorder.png'],
-      },
-    };
-  }
-}
+export const metadata = {
+  title: 'AutoOrder - Mașini la comandă din licitații B2B | România',
+  description: 'AutoOrder îți găsește mașina perfectă din licitațiile B2B europene. Transparență totală, costuri clare și livrare rapidă. Economisește 15-30% față de piața locală.',
+  keywords: 'mașini B2B, licitații auto, import auto România, vehicule Germania, economie auto, AutoOrder',
+  openGraph: {
+    title: 'AutoOrder - Mașini la comandă din licitații B2B',
+    description: 'Găsește mașina perfectă din licitațiile B2B europene. Transparență totală și economie garantată.',
+    type: 'website',
+    locale: 'ro_RO',
+    siteName: 'AutoOrder',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AutoOrder - Mașini la comandă din licitații B2B',
+    description: 'Găsește mașina perfectă din licitațiile B2B europene. Transparență totală și economie garantată.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+  },
+};
 
 export default async function HomePage() {
-  const settings = await getSiteSettings();
-
   return (
     <main className="min-h-screen">
-      {/* Hero Section - Full screen with compelling CTA */}
-      <Hero 
-        title={settings.hero.title}
-        subtitle={settings.hero.subtitle}
-        ctaLabel={settings.hero.ctaLabel}
-        ctaHref={settings.hero.ctaHref}
-        heroImage={settings.hero.heroImage}
-      />
-      
-      {/* Trust Indicators - Social proof and statistics */}
+      {/* Hero Section - Premium and minimalist */}
+      <Hero />
+
+      {/* Trust Indicators - Clean and elegant */}
       <TrustIndicators />
-      
-      {/* Benefits Section - Why choose AutoOrder */}
-      <Benefits />
-      
-      {/* How It Works - Comprehensive process explanation */}
+
+      {/* How It Works - Process explanation */}
       <HowItWorks />
-      
-      {/* Success Stories - Real success cases with savings */}
+
+      {/* Success Stories - Customer testimonials */}
       <SuccessStories />
-      
-      {/* Testimonials - Customer reviews */}
+
+      {/* Testimonials - Social proof */}
       <Testimonials />
-      
-      {/* Cost Calculator Section - Interactive tool */}
-      <section className="py-20 bg-gradient-to-b from-muted/30 to-background">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-              Calculează costul total
+
+      {/* Cost Calculator - Interactive tool */}
+      <section className="py-32 bg-white">
+        <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-24">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-slate-900 mb-8 leading-tight tracking-tight">
+              Calculează costurile
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Estimează costurile pentru mașina dorită și vezi economiile pe care le poți face
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-light">
+              Estimează costul total pentru mașina dorită din licitațiile B2B
             </p>
           </div>
           <CostMiniCalculator />
         </div>
       </section>
-      
-      {/* Featured Stock - Showcase available vehicles */}
+
+      {/* Featured Stock - Available vehicles */}
       <FeaturedStock />
-      
-      {/* FAQ Section - Address common concerns */}
+
+      {/* FAQ - Common questions */}
       <FAQ />
-      
-      {/* Final CTA Section - Last chance to convert */}
+
+      {/* Final CTA - Conversion optimization */}
       <FinalCTA />
     </main>
   );

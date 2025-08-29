@@ -48,61 +48,61 @@ export function FAQ() {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-b from-background to-muted/30">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="py-32 bg-slate-50">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <motion.div 
-          className="text-center mb-20"
+          className="text-center mb-24"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <Badge variant="secondary" className="mb-4">
+          <Badge variant="outline" className="mb-8 px-6 py-3 text-sm font-medium border-slate-200 text-slate-600 bg-white/80 backdrop-blur-sm">
             Întrebări frecvente
           </Badge>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-slate-900 mb-8 leading-tight tracking-tight">
             Răspunsuri la întrebările tale
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-light">
             Tot ce trebuie să știi despre procesul AutoOrder. 
             Suntem aici să răspundem la toate întrebările tale.
           </p>
         </motion.div>
 
-        <div className="max-w-4xl mx-auto space-y-4 mb-20">
+        <div className="max-w-4xl mx-auto space-y-4 mb-24">
           {faqs.map((faq, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 * index }}
+              transition={{ duration: 0.6, delay: 0.1 * index, ease: "easeOut" }}
             >
-              <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm overflow-hidden">
+              <Card className="border-0 shadow-sm hover:shadow-lg transition-all duration-500 bg-white hover:bg-slate-50/50 overflow-hidden group border border-slate-100">
                 <CardContent className="p-0">
                   <Button
                     variant="ghost"
-                    className="w-full justify-between p-6 text-left font-medium hover:bg-muted/50 transition-all duration-300 group"
+                    className="w-full justify-between p-6 text-left font-medium hover:bg-slate-50 transition-all duration-300 group"
                     onClick={() => toggleFAQ(index)}
                   >
                     <div className="flex items-start gap-4 flex-1">
-                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                        <HelpCircle className="h-5 w-5 text-primary" />
+                      <div className="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center flex-shrink-0 mt-1 border border-slate-100 group-hover:border-slate-200 transition-colors duration-300">
+                        <HelpCircle className="h-5 w-5 text-slate-600" />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs border-slate-200 text-slate-600 bg-white">
                             {faq.category}
                           </Badge>
                         </div>
-                        <span className="pr-4 text-lg leading-relaxed">{faq.question}</span>
+                        <span className="pr-4 text-base md:text-lg leading-relaxed font-medium text-slate-900">{faq.question}</span>
                       </div>
                     </div>
                     <div className="flex-shrink-0">
                       {openIndex === index ? (
-                        <ChevronUp className="h-6 w-6 text-primary transition-transform duration-300" />
+                        <ChevronUp className="h-6 w-6 text-slate-600 transition-transform duration-300" />
                       ) : (
-                        <ChevronDown className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-all duration-300" />
+                        <ChevronDown className="h-6 w-6 text-slate-400 group-hover:text-slate-600 transition-all duration-300" />
                       )}
                     </div>
                   </Button>
@@ -117,8 +117,8 @@ export function FAQ() {
                         className="overflow-hidden"
                       >
                         <div className="px-6 pb-6">
-                          <div className="border-t border-muted/50 pt-6">
-                            <p className="text-muted-foreground leading-relaxed text-lg">
+                          <div className="border-t border-slate-100 pt-6">
+                            <p className="text-slate-600 leading-relaxed text-base md:text-lg font-light">
                               {faq.answer}
                             </p>
                           </div>
@@ -138,13 +138,13 @@ export function FAQ() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
         >
-          <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-3xl p-8 md:p-12 max-w-4xl mx-auto border border-primary/20">
-            <h3 className="text-2xl md:text-3xl font-bold mb-4 text-foreground">
+          <div className="bg-white rounded-3xl p-12 md:p-16 max-w-4xl mx-auto border border-slate-100 shadow-sm">
+            <h3 className="text-2xl md:text-3xl font-light mb-6 text-slate-900">
               Ai alte întrebări?
             </h3>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-lg text-slate-600 mb-10 font-light">
               Suntem aici să te ajutăm să faci alegerea potrivită. 
               Contactează-ne pentru orice clarificări suplimentare.
             </p>
@@ -153,7 +153,7 @@ export function FAQ() {
               <Button 
                 asChild 
                 size="lg"
-                className="text-lg px-8 py-6 h-auto shadow-2xl hover:shadow-primary/25 transition-all duration-300 transform hover:scale-105"
+                className="text-lg px-8 py-6 h-auto bg-slate-900 hover:bg-slate-800 text-white shadow-sm hover:shadow-lg transition-all duration-300 transform hover:scale-105 border-0"
               >
                 <a href="/contact">
                   Cere ofertă personalizată
@@ -165,7 +165,7 @@ export function FAQ() {
                 asChild 
                 variant="outline" 
                 size="lg"
-                className="text-lg px-8 py-6 h-auto border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300 transform hover:scale-105"
+                className="text-lg px-8 py-6 h-auto border-2 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 transform hover:scale-105"
               >
                 <a href="/contact">
                   Contactează-ne

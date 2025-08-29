@@ -52,57 +52,56 @@ const trustBadges = [
 
 export function TrustIndicators() {
   return (
-    <section className="py-20 bg-gradient-to-b from-background to-muted/30">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+    <section className="py-32 bg-white">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        {/* Premium section header */}
         <motion.div 
-          className="text-center mb-16"
+          className="text-center mb-24"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <Badge variant="secondary" className="mb-4">
+          <Badge variant="outline" className="mb-8 px-6 py-3 text-sm font-medium border-slate-200 text-slate-600 bg-white/80 backdrop-blur-sm">
             De încredere
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-slate-900 mb-8 leading-tight tracking-tight">
             De ce clienții aleg AutoOrder
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-light">
             Rezultatele vorbesc de la sine. Suntem liderii în România pentru licitații B2B de vehicule.
           </p>
         </motion.div>
 
-        {/* Trust Statistics */}
+        {/* Trust Statistics - Clean and minimal */}
         <motion.div 
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20"
+          className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-32"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
         >
           {trustStats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
               <motion.div
                 key={index}
-                className="text-center"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                className="text-center group"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 * index }}
-                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.6, delay: 0.1 * index, ease: "easeOut" }}
               >
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <IconComponent className="h-8 w-8 text-primary" />
+                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-slate-100 group-hover:border-slate-200 transition-colors duration-300">
+                  <IconComponent className="h-8 w-8 text-slate-600" />
                 </div>
-                <div className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+                <div className="text-3xl md:text-4xl font-light text-slate-900 mb-3">
                   {stat.value}
                 </div>
-                <div className="text-lg font-semibold text-foreground mb-1">
+                <div className="text-lg font-medium text-slate-700 mb-2">
                   {stat.label}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-slate-500 font-light">
                   {stat.description}
                 </div>
               </motion.div>
@@ -110,13 +109,13 @@ export function TrustIndicators() {
           })}
         </motion.div>
 
-        {/* Trust Badges */}
+        {/* Trust Badges - Elegant cards */}
         <motion.div 
-          className="grid md:grid-cols-3 gap-8"
+          className="grid md:grid-cols-3 gap-8 mb-24"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
         >
           {trustBadges.map((badge, index) => {
             const IconComponent = badge.icon;
@@ -126,18 +125,18 @@ export function TrustIndicators() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 * index }}
-                whileHover={{ y: -5 }}
+                transition={{ duration: 0.6, delay: 0.1 * index, ease: "easeOut" }}
+                whileHover={{ y: -8 }}
               >
-                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm">
-                  <CardContent className="pt-8 text-center">
-                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <IconComponent className="h-10 w-10 text-primary" />
+                <Card className="border-0 shadow-sm hover:shadow-lg transition-all duration-500 bg-white hover:bg-slate-50/50 cursor-pointer group">
+                  <CardContent className="pt-12 p-8 text-center">
+                    <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-8 border border-slate-100 group-hover:border-slate-200 transition-colors duration-300">
+                      <IconComponent className="h-10 w-10 text-slate-600" />
                     </div>
-                    <h3 className="text-xl font-semibold mb-3 text-foreground">
+                    <h3 className="text-xl font-medium mb-4 text-slate-900 group-hover:text-slate-800 transition-colors duration-300">
                       {badge.title}
                     </h3>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-slate-600 leading-relaxed font-light">
                       {badge.description}
                     </p>
                   </CardContent>
@@ -147,37 +146,37 @@ export function TrustIndicators() {
           })}
         </motion.div>
 
-        {/* Social Proof */}
+        {/* Social Proof - Minimal and elegant */}
         <motion.div 
-          className="mt-20 text-center"
+          className="text-center"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
         >
-          <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-3xl p-8 md:p-12">
-            <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="bg-slate-50 rounded-3xl p-12 md:p-16 border border-slate-100 max-w-4xl mx-auto">
+            <div className="flex items-center justify-center gap-2 mb-8">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="h-6 w-6 text-yellow-500 fill-current" />
               ))}
             </div>
-            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+            <h3 className="text-2xl md:text-3xl font-light text-slate-900 mb-6 leading-relaxed">
               "AutoOrder mi-a salvat 8.000€ pe mașina visurilor mele!"
             </h3>
-            <p className="text-lg text-muted-foreground mb-6">
+            <p className="text-lg text-slate-600 mb-8 font-light">
               - Maria D., clientă din București
             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-500">
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <div className="w-1.5 h-1.5 bg-slate-400 rounded-full" />
                 Verificare completă istoric
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <div className="w-1.5 h-1.5 bg-slate-400 rounded-full" />
                 Livrare organizată complet
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
+                <div className="w-1.5 h-1.5 bg-slate-400 rounded-full" />
                 Suport post-vânzare
               </span>
             </div>
