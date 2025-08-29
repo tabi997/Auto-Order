@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { SlidersHorizontal, X, Filter } from 'lucide-react';
+import { SlidersHorizontal, X, Filter, RefreshCw } from 'lucide-react';
 import { useTranslation } from '@/i18n';
 import { useQueryParams } from '@/lib/hooks';
 
@@ -119,7 +119,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
   const getCountryLabel = (country: string) => t(`countries.${country}`) || country;
 
   const FilterSection = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-    <div className={`space-y-3 ${className}`}>
+    <div className={`space-y-4 ${className}`}>
       {children}
     </div>
   );
@@ -133,19 +133,19 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
     children: React.ReactNode; 
     className?: string;
   }) => (
-    <div className={`space-y-2 ${className}`}>
-      <label className="text-sm font-medium">{label}</label>
+    <div className={`space-y-3 ${className}`}>
+      <label className="text-sm font-medium text-slate-700">{label}</label>
       {children}
     </div>
   );
 
   const filtersContent = (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Brand & Model */}
       <FilterSection>
         <FilterField label={t('stock.filters.brand')}>
           <Select value={filters.brand} onValueChange={(value) => handleFilterChange('brand', value)}>
-            <SelectTrigger>
+            <SelectTrigger className="h-12 border-slate-200 focus:border-primary focus:ring-primary">
               <SelectValue placeholder="Toate brandurile" />
             </SelectTrigger>
             <SelectContent>
@@ -164,6 +164,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
             placeholder="Caută model..."
             value={filters.model}
             onChange={(e) => handleFilterChange('model', e.target.value)}
+            className="h-12 border-slate-200 focus:border-primary focus:ring-primary"
           />
         </FilterField>
       </FilterSection>
@@ -172,7 +173,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
       <FilterSection>
         <FilterField label={t('stock.filters.body')}>
           <Select value={filters.body} onValueChange={(value) => handleFilterChange('body', value)}>
-            <SelectTrigger>
+            <SelectTrigger className="h-12 border-slate-200 focus:border-primary focus:ring-primary">
               <SelectValue placeholder="Toate tipurile" />
             </SelectTrigger>
             <SelectContent>
@@ -188,7 +189,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
 
         <FilterField label={t('stock.filters.fuel')}>
           <Select value={filters.fuel} onValueChange={(value) => handleFilterChange('fuel', value)}>
-            <SelectTrigger>
+            <SelectTrigger className="h-12 border-slate-200 focus:border-primary focus:ring-primary">
               <SelectValue placeholder="Toate combustibilele" />
             </SelectTrigger>
             <SelectContent>
@@ -213,6 +214,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
             onChange={(e) => handleFilterChange('yearMin', e.target.value)}
             min={filterOptions.yearRange.min}
             max={filterOptions.yearRange.max}
+            className="h-12 border-slate-200 focus:border-primary focus:ring-primary"
           />
         </FilterField>
 
@@ -224,6 +226,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
             onChange={(e) => handleFilterChange('yearMax', e.target.value)}
             min={filterOptions.yearRange.min}
             max={filterOptions.yearRange.max}
+            className="h-12 border-slate-200 focus:border-primary focus:ring-primary"
           />
         </FilterField>
       </FilterSection>
@@ -237,6 +240,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
             value={filters.kmMax}
             onChange={(e) => handleFilterChange('kmMax', e.target.value)}
             min="0"
+            className="h-12 border-slate-200 focus:border-primary focus:ring-primary"
           />
         </FilterField>
 
@@ -247,6 +251,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
             value={filters.priceMin}
             onChange={(e) => handleFilterChange('priceMin', e.target.value)}
             min="0"
+            className="h-12 border-slate-200 focus:border-primary focus:ring-primary"
           />
         </FilterField>
 
@@ -257,6 +262,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
             value={filters.priceMax}
             onChange={(e) => handleFilterChange('priceMax', e.target.value)}
             min="0"
+            className="h-12 border-slate-200 focus:border-primary focus:ring-primary"
           />
         </FilterField>
       </FilterSection>
@@ -265,7 +271,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
       <FilterSection>
         <FilterField label={t('stock.filters.country')}>
           <Select value={filters.country} onValueChange={(value) => handleFilterChange('country', value)}>
-            <SelectTrigger>
+            <SelectTrigger className="h-12 border-slate-200 focus:border-primary focus:ring-primary">
               <SelectValue placeholder="Toate țările" />
             </SelectTrigger>
             <SelectContent>
@@ -281,7 +287,7 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
 
         <FilterField label={t('stock.filters.gearbox')}>
           <Select value={filters.gearbox} onValueChange={(value) => handleFilterChange('gearbox', value)}>
-            <SelectTrigger>
+            <SelectTrigger className="h-12 border-slate-200 focus:border-primary focus:ring-primary">
               <SelectValue placeholder="Toate cutiile" />
             </SelectTrigger>
             <SelectContent>
@@ -297,11 +303,19 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
       </FilterSection>
 
       {/* Action Buttons */}
-      <div className="space-y-3 pt-4">
-        <Button onClick={applyFilters} className="w-full">
+      <div className="space-y-4 pt-6 border-t border-slate-100">
+        <Button 
+          onClick={applyFilters} 
+          className="w-full bg-slate-900 hover:bg-slate-800 text-white border-0 shadow-sm hover:shadow-lg transition-all duration-300 h-12 text-base font-medium"
+        >
           {t('stock.filters.apply')}
         </Button>
-        <Button onClick={clearAllFilters} variant="outline" className="w-full">
+        <Button 
+          onClick={clearAllFilters} 
+          variant="outline" 
+          className="w-full h-12 text-base border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+        >
+          <RefreshCw className="h-4 w-4 mr-2" />
           {t('stock.filters.clear')}
         </Button>
       </div>
@@ -311,26 +325,26 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
   return (
     <>
       {/* Mobile Filter Toggle */}
-      <div className="md:hidden mb-4">
+      <div className="md:hidden mb-6">
         <Button
           variant="outline"
           onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="w-full"
+          className="w-full h-12 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
         >
-          <Filter className="h-4 w-4 mr-2" />
+          <Filter className="h-5 w-5 mr-2" />
           {t('stock.filters.title')} ({Object.keys(activeFilters).length})
         </Button>
       </div>
 
       {/* Active Filters Display */}
       {Object.keys(activeFilters).length > 0 && (
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mb-6 flex flex-wrap gap-2">
           {Object.entries(activeFilters).map(([key, value]) => (
-            <Badge key={key} variant="secondary" className="gap-1">
-              {key}: {value}
+            <Badge key={key} variant="secondary" className="gap-2 px-3 py-2 bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200">
+              <span className="text-xs font-medium">{key}: {value}</span>
               <button
                 onClick={() => clearFilter(key)}
-                className="ml-1 hover:bg-black/20 rounded-full p-0.5"
+                className="ml-1 hover:bg-slate-300 rounded-full p-1 transition-colors duration-200"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -341,10 +355,10 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
 
       {/* Desktop Filters */}
       <div className="hidden md:block">
-        <Card className={className}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <SlidersHorizontal className="h-5 w-5" />
+        <Card className={`border-0 shadow-sm hover:shadow-lg transition-all duration-300 ${className}`}>
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-3 text-lg font-medium text-slate-900">
+              <SlidersHorizontal className="h-6 w-6 text-primary" />
               {t('stock.filters.title')}
             </CardTitle>
           </CardHeader>
@@ -357,10 +371,10 @@ export function VehicleFilters({ filterOptions, className }: VehicleFiltersProps
       {/* Mobile Filters */}
       {isMobileOpen && (
         <div className="md:hidden">
-          <Card className="mb-4">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <SlidersHorizontal className="h-5 w-5" />
+          <Card className="mb-6 border-0 shadow-lg">
+            <CardHeader className="pb-6">
+              <CardTitle className="flex items-center gap-3 text-lg font-medium text-slate-900">
+                <SlidersHorizontal className="h-6 w-6 text-primary" />
                 {t('stock.filters.title')}
               </CardTitle>
             </CardHeader>
