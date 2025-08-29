@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import { Hero } from '@/components/home/Hero';
-import LeadQuickForm from '@/components/home/LeadQuickForm';
-import { ProcessTimeline } from '@/components/home/ProcessTimeline';
+import { TrustIndicators } from '@/components/home/TrustIndicators';
+import { HowItWorks } from '@/components/home/HowItWorks';
+import { SuccessStories } from '@/components/home/SuccessStories';
 import { Testimonials } from '@/components/Testimonials';
 import { Benefits } from '@/components/home/Benefits';
 import { CostMiniCalculator } from '@/components/home/CostMiniCalculator';
@@ -42,7 +43,7 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen">
-      {/* Hero Section */}
+      {/* Hero Section - Full screen with compelling CTA */}
       <Hero 
         title={settings.hero.title}
         subtitle={settings.hero.subtitle}
@@ -51,40 +52,43 @@ export default async function HomePage() {
         heroImage={settings.hero.heroImage}
       />
       
-      {/* Lead Quick Form Section */}
-      <LeadQuickForm />
+      {/* Trust Indicators - Social proof and statistics */}
+      <TrustIndicators />
       
-      {/* Benefits Section */}
+      {/* Benefits Section - Why choose AutoOrder */}
       <Benefits />
       
-      {/* Process Timeline Section */}
-      <ProcessTimeline />
+      {/* How It Works - Comprehensive process explanation */}
+      <HowItWorks />
       
-      {/* Testimonials Section */}
+      {/* Success Stories - Real success cases with savings */}
+      <SuccessStories />
+      
+      {/* Testimonials - Customer reviews */}
       <Testimonials />
       
-      {/* Cost Calculator Section */}
-      <section className="py-20">
-        <div className="container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+      {/* Cost Calculator Section - Interactive tool */}
+      <section className="py-20 bg-gradient-to-b from-muted/30 to-background">
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
               Calculează costul total
             </h2>
-            <p className="text-xl text-muted-foreground">
-              Estimează costurile pentru mașina dorită
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Estimează costurile pentru mașina dorită și vezi economiile pe care le poți face
             </p>
           </div>
           <CostMiniCalculator />
         </div>
       </section>
       
-      {/* Featured Stock Section */}
+      {/* Featured Stock - Showcase available vehicles */}
       <FeaturedStock />
       
-      {/* FAQ Section */}
+      {/* FAQ Section - Address common concerns */}
       <FAQ />
       
-      {/* Final CTA Section */}
+      {/* Final CTA Section - Last chance to convert */}
       <FinalCTA />
     </main>
   );

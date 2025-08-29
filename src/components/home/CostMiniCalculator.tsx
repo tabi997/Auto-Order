@@ -53,11 +53,8 @@ export function CostMiniCalculator() {
 
   const handleGetOffer = () => {
     if (result) {
-      // Scroll to lead form and potentially pre-populate
-      const leadForm = document.getElementById('lead-quick');
-      if (leadForm) {
-        leadForm.scrollIntoView({ behavior: 'smooth' });
-      }
+      // Navigate to contact page instead of scrolling to lead form
+      window.location.href = '/contact';
     }
   };
 
