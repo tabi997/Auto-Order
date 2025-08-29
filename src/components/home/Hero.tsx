@@ -5,7 +5,15 @@ import { ArrowRight, Car, Shield, Clock, Truck, CheckCircle } from 'lucide-react
 import Link from 'next/link';
 import { useHomeTranslation } from '@/i18n';
 
-export function Hero() {
+interface HeroProps {
+  title: string;
+  subtitle: string;
+  ctaLabel: string;
+  ctaHref: string;
+  heroImage?: string;
+}
+
+export function Hero({ title, subtitle, ctaLabel, ctaHref, heroImage }: HeroProps) {
   const { t } = useHomeTranslation();
 
   return (
@@ -13,16 +21,28 @@ export function Hero() {
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-background" />
       
+      {/* Hero Image Background */}
+      {heroImage && (
+        <div className="absolute inset-0">
+          <img
+            src={heroImage}
+            alt="Hero background"
+            className="w-full h-full object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background/80 to-background" />
+        </div>
+      )}
+      
       <div className="relative container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-4xl mx-auto">
           {/* Main heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-            Mașina visurilor tale, direct din licitațiile B2B
+            {title}
           </h1>
           
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed">
-            Preț final garantat • Istoric verificat • Livrare în România în 14-21 zile
+            {subtitle}
           </p>
           
           {/* CTA buttons */}
@@ -33,8 +53,8 @@ export function Hero() {
               className="text-lg px-8 py-6"
               data-analytics-id="hero_cta"
             >
-              <Link href="#lead-quick" aria-label="Cere ofertă personalizată">
-                Cere ofertă personalizată
+              <Link href={ctaHref} aria-label={ctaLabel}>
+                {ctaLabel}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
